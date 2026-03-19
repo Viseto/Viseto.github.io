@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNS Certification Game</title>
+    <style>
+        :root { --primary: #38bdf8; --success: #22c55e; --danger: #ef4444; --bg: #020617; --card: #1e293b; --text: #f8fafc; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        #game-container { background: var(--card); width: 95%; max-width: 900px; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        
+        /* LOBBY */
+        #lobby { display: flex; padding: 40px; gap: 40px; }
+        .leaderboard { flex: 1; background: #0f172a; padding: 20px; border-radius: 15px; border: 1px solid #334155; min-width: 250px; }
+        .leaderboard h2 { font-size: 18px; color: var(--primary); margin-top: 0; text-align: center; border-bottom: 1px solid #334155; padding-bottom: 10px; text-transform: uppercase; }
+        .lb-list { list-style: none; padding: 0; margin: 0; font-size: 14px; }
+        .lb-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e293b; }
+        .lb-name { font-weight: bold; color: #94a3b8; }
+        .lb-score { color: var(--primary); }
+
+        .main-menu { flex: 2; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        h1 { color: var(--primary); font-size: 32px; text-shadow: 0 0 10px rgba(56,189,248,0.3); }
+        input#username { width: 80%; padding: 15px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 18px; margin: 20px auto; text-align: center; outline: none; }
+        input#username:focus { border-color: var(--primary); }
+        .btn-start { background: var(--primary); color: #020617; padding: 18px 45px; border: none; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-start:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(56,189,248,0.5); }
+
+        /* QUIZ */
+        #quiz-ui { display: none; padding: 40px; }
+        .header-quiz { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .badge { background: var(--primary); color: #020617; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 12px; }
+        .question-text { font-size: 22px; font-weight: 600; margin-bottom: 30px; line-height: 1.4; color: #fff; }
+        .options { display: grid; gap: 15px; }
+        .option { background: #334155; border: 2px solid transparent; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; font-size: 16px; }
+        .option:hover { background: #475569; }
+        .option.selected { border-color: var(--primary); background: #1e293b; }
+        .option.correct { background: var(--success) !important; color: white; font-weight: bold; }
+        .option.wrong { background: var(--danger) !important; color: white; }
+        
+        /* RECAP */
+        #recap { display: none; padding: 40px; text-align: center; }
+        .score-val { font-size: 60px; font-weight: bold; color: var(--primary); margin: 10px 0; }
+        .recap-scroll { text-align: left; max-height: 400px; overflow-y: auto; background: #0f172a; padding: 20px; border-radius: 15px; margin-top: 25px; border: 1px solid #334155; }
+
+        @media (max-width: 768px) { #lobby { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="lobby">
+        <div class="leaderboard">
+            <h2>🏆 TOP 10 SCORES</h2>
+            <ul id="lb-list" class="lb-list">
+                <li class="lb-item">Chargement du cloud...</li>
+            </ul>
+        </div>
+        <div class="main-menu">
+            <div style="font-size: 60px;">🛡️</div>
+            <h1>SNS QUIZ GAME</h1>
+            <p>Préparez la certification Stormshield</p>
+            <input type="text" id="username" placeholder="Pseudo de l'admin..." maxlength="15">
+            <button class="btn-start" onclick="startGame()">DÉMARRER LA SESSION</button>
+        </div>
+    </div>
+
+    <div id="quiz-ui">
+        <div class="header-quiz">
+            <span id="category-badge" class="badge">SESSION</span>
+            <span id="progress-text" style="font-weight:bold; color:var(--primary);">1 / 65</span>
+        </div>
+        <div class="question-text" id="q-text"></div>
+        <div class="options" id="q-options"></div>
+        <div style="margin-top:40px;">
+            <button id="validate-btn" class="btn-start" style="width:100%" onclick="validateAnswer()" disabled>VALIDER</button>
+            <button id="next-btn" class="btn-start" style="width:100%; display:none; background:var(--success)" onclick="nextQuestion()">QUESTION SUIVANTE &raquo;</button>
+        </div>
+    </div>
+
+    <div id="recap">
+        <h1>Analyse Terminée</h1>
+        <div id="final-score" class="score-val">0 / 65</div>
+        <p id="player-rank-msg"></p>
+        <div class="recap-scroll" id="recap-list"></div>
+        <button class="btn-start" style="margin-top:30px; width:100%" onclick="location.reload()">RETOUR AU LOBBY</button>
+    </div>
+</div>
+
+<script>
+    // Configuration KVdb
+    const API_URL = "https://kvdb.io/Hn1xhfgt9ftjtXFyxzjSjK/leaderboard";
+
+    const allQuestions = [
+        { cat: "Usine", q: "Combien de politiques de filtrage NAT locales peuvent être actives à la fois ?", options: ["1", "5", "10"], correct: 0 },
+        { cat: "Usine", q: "Par défaut, la durée de vie d’un tunnel VPN SSL est de :", options: ["3 600s", "14 400s", "36 000s"], correct: 1 },
+        { cat: "Usine", q: "LDAP interne : l’authentification s’effectue obligatoirement par mot de passe ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Usine", q: "Firewall en configuration usine :", options: ["Bloque tout", "Bloque tout sauf pings et ports admin", "Laisse tout passer"], correct: 1 },
+        { cat: "Usine", q: "Si le mot de passe 'admin' est inchangé, l'interface affiche une erreur critique ?", options: ["Oui", "Non"], correct: 0 },
+        { cat: "Technique", q: "Deux VLAN peuvent-ils être rattachés à la même interface physique ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Technique", q: "Plusieurs adresses IP sur une seule interface du firewall ?", options: ["Non", "Oui, dans tous les cas", "Seulement modèle SN510+"], correct: 1 },
+        { cat: "Technique", q: "Le nombre maximum d’interfaces peut-il être modifié ?", options: ["Oui", "Non, dépend du modèle", "Seulement via CLI"], correct: 1 },
+        { cat: "Technique", q: "Limiter la taille des paquets ICMP (ping) entrants ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Admin", q: "Sur appliances physiques, copier la partition active vers la passive ?", options: ["Oui", "Non"], correct: 0 },
+        { cat: "Admin", q: "Basculer de partition principale à secours sans redémarrage ?", options: ["Oui", "Non"], correct: 1 },
+        { cat: "Admin", q: "Service NTP : a besoin du fuseau horaire pour l’heure locale ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Admin", q: "Fréquence Active Update paramétrable depuis l’interface ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Admin", q: "Le firewall peut être serveur DHCP ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Admin", q: "Navigateurs supportés :", options: ["Firefox, Edge, Chrome", "Opera, Safari", "Uniquement Firefox"], correct: 0 },
+        { cat: "Logs", q: "Modifier le % d'espace disque par famille de traces ?", options: ["Oui", "Non"], correct: 0 },
+        { cat: "Logs", q: "Logs pleins : que se passe-t-il ?", options: ["Arrêt firewall", "Rotation automatique", "Envoi d'un ping"], correct: 1 },
+        { cat: "Logs", q: "Visualiser les journaux via Wireshark ?", options: ["Oui", "Non (Interface Admin)"], correct: 1 },
+        { cat: "Logs", q: "Le RGPD a-t-il un impact sur la gestion des logs ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Logs", q: "Arrêter l’écriture des événements pour une catégorie ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Objets", q: "Plusieurs objets FQDN en destination d'une règle ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Objets", q: "Réseau machine : résolution ARP périodique ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Objets", q: "Serveur DNS : sert à quoi ?", options: ["Associer nom et IP", "Envoyer des mails", "Faire du NAT"], correct: 0 },
+        { cat: "Objets", q: "Équivalent objet 'Internet' :", options: ["Any", "Network_in", "Firewall_internals"], correct: 0 },
+        { cat: "Objets", q: "Norme des VLAN sur Stormshield :", options: ["802.1Q", "RFC 894", "Hyperlan"], correct: 0 },
+        { cat: "Objets", q: "Plus de deux interfaces dans un bridge ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Routage", q: "Répartition de charge possible pour :", options: ["Défaut", "Politique", "Dynamique", "Tous les types précités"], correct: 3 },
+        { cat: "Routage", q: "Route statique : interface de sortie obligatoire ?", options: ["Vrai", "Faux"], correct: 1 },
+        { cat: "Routage", q: "Priorité par défaut (1 = prioritaire) :", options: ["PBR > Statique > Dynamique", "Statique > PBR > Dynamique", "Défaut > Statique"], correct: 0 },
+        { cat: "Routage", q: "NAT : modifier IP Source ET IP Destination simultanément ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Routage", q: "Poids 50% GW1, 25% GW2, 25% GW3 :", options: ["2/1/1", "4/2/2", "Les deux"], correct: 2 },
+        { cat: "Filtrage", q: "Règle pour serveur Web DMZ accessible d'Internet :", options: ["Internet vers IP Publique", "Internet vers IP Privée", "DMZ vers Internet"], correct: 0 },
+        { cat: "Filtrage", q: "IPS Stormshield est-il propriétaire ?", options: ["Oui", "Non (Open Source)"], correct: 0 },
+        { cat: "Filtrage", q: "Ordre de traitement des règles :", options: ["Par ordre d'apparition", "Plus restrictive en premier", "Bloquer en premier"], correct: 0 },
+        { cat: "Filtrage", q: "L'action 'Bloquer' déclenche une alarme ?", options: ["Vrai", "Faux"], correct: 1 },
+        { cat: "Filtrage", q: "Filtrage par SNI (certificat) utilisable sur :", options: ["HTTP", "HTTPS", "Les deux"], correct: 1 },
+        { cat: "VPN", q: "Standard IPsec défini par :", options: ["IETF (Internet)", "Stormshield", "Cisco"], correct: 0 },
+        { cat: "VPN", q: "Protocole de négociation IPsec :", options: ["IKE", "ESP", "AH"], correct: 0 },
+        { cat: "VPN", q: "Phases pour établir un tunnel IPsec ?", options: ["1", "2", "3"], correct: 1 },
+        { cat: "VPN", q: "VPN SSL : droit d'accès global à tous ?", options: ["Vrai", "Faux"], correct: 1 },
+        { cat: "VPN", q: "Keepalive IPsec se configure en :", options: ["Secondes", "Minutes", "Heures"], correct: 0 },
+        { cat: "VPN", q: "Chiffrement IPsec assuré par :", options: ["ESP", "AH", "L2TP"], correct: 0 },
+        { cat: "Avancé", q: "Analyse antivirale sur flux HTTPS :", options: ["Oui, si déchiffrement", "Oui, toujours", "Non jamais"], correct: 0 },
+        { cat: "Avancé", q: "Breach Fighter nécessite 'Antivirus avancé' ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Avancé", q: "Extended Web Control évite le stockage local URL ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Avancé", q: "HTTPS non déchiffré : certificat affiché est celui du proxy ?", options: ["Vrai", "Faux"], correct: 1 },
+        { cat: "Avancé", q: "Proxy SSL activé via règle de filtrage ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Admin", q: "Sauvegarde partition active possible ?", options: ["Oui, tous modèles", "Physique seulement", "Virtuel seulement"], correct: 0 },
+        { cat: "Technique", q: "Mode 'Transparent' :", options: ["Bridge (Interfaces pontées)", "Adressage par interface", "Aucune IP"], correct: 0 },
+        { cat: "Routage", q: "Routage sans NAT : champs modifiés ?", options: ["MAC Source/Destination", "IP Source/Destination", "Ports"], correct: 0 },
+        { cat: "Logs", q: "Accès complet aux logs via code temporaire ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Auth", q: "Auth LDAP interne : mot de passe obligatoire ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Filtrage", q: "Connexions externes analysées ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Technique", q: "135.1.1.0/23 est une adresse :", options: ["Réseau", "Hôte", "Broadcast"], correct: 0 },
+        { cat: "VPN", q: "VPN entre 2 SNS :", options: ["IPsec", "SSL", "OpenVPN", "Tous"], correct: 3 },
+        { cat: "Admin", q: "Administration via :", options: ["Navigateur, CLI, SSH", "Telnet uniquement", "Console uniquement"], correct: 0 },
+        { cat: "Filtrage", q: "Modifier l'action de plusieurs règles à la fois ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Technique", q: "Interfaces VLAN toujours internes ?", options: ["Vrai", "Faux"], correct: 1 },
+        { cat: "Routage", q: "Translation statique :", options: ["1 IP Privée vers 1 IP Publique", "N vers 1", "1 vers N"], correct: 0 },
+        { cat: "Avancé", q: "Redirection port ICMP possible ?", options: ["Vrai", "Faux"], correct: 1 },
+        { cat: "Logs", q: "Tracer une règle NAT ?", options: ["Oui", "Non"], correct: 0 },
+        { cat: "VPN", q: "IKEv1 : extrémités de trafic identiques ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Routage", q: "Algorithme répartition : quadruplet IP/Port ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Auth", q: "Politique d'auth basée sur machine source ?", options: ["Vrai", "Faux"], correct: 0 },
+        { cat: "Objets", q: "Objet FQDN : adresse via DNS ?", options: ["Vrai", "Faux"], correct: 0 }
+    ];
+
+    let gameQuestions = [];
+    let currentIdx = 0;
+    let selectedIdx = null;
+    let score = 0;
+    let playerName = "";
+    let history = [];
+
+    // LEADERBOARD API
+    async function loadLeaderboard() {
+        const list = document.getElementById('lb-list');
+        try {
+            const resp = await fetch(API_URL);
+            if (!resp.ok) throw new Error();
+            const lb = await resp.json();
+            list.innerHTML = lb.sort((a,b) => b.score - a.score).slice(0, 10).map(i => 
+                `<li class="lb-item"><span class="lb-name">${i.name}</span> <span class="lb-score">${i.score}/65</span></li>`
+            ).join('') || '<li class="lb-item">Soyez le premier !</li>';
+        } catch (e) {
+            list.innerHTML = '<li class="lb-item">Prêt pour les records</li>';
+        }
+    }
+
+    async function saveScore(name, finalScore) {
+        try {
+            let lb = [];
+            const resp = await fetch(API_URL);
+            if (resp.ok) lb = await resp.json();
+            lb.push({ name, score: finalScore });
+            lb = lb.sort((a,b) => b.score - a.score).slice(0, 50);
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify(lb) });
+        } catch (e) { console.error("API error", e); }
+    }
+
+    // ENGINE
+    function startGame() {
+        playerName = document.getElementById('username').value.trim();
+        if(!playerName) return alert("Veuillez entrer un pseudo !");
+        document.getElementById('lobby').style.display = 'none';
+        document.getElementById('quiz-ui').style.display = 'block';
+        gameQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = gameQuestions[currentIdx];
+        document.getElementById('category-badge').innerText = q.cat;
+        document.getElementById('progress-text').innerText = `${currentIdx + 1} / 65`;
+        document.getElementById('q-text').innerText = q.q;
+        const optsDiv = document.getElementById('q-options');
+        optsDiv.innerHTML = '';
+        selectedIdx = null;
+        q.options.forEach((opt, i) => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerText = opt;
+            div.onclick = () => {
+                if(document.getElementById('next-btn').style.display === 'block') return;
+                selectedIdx = i;
+                document.querySelectorAll('.option').forEach((el, idx) => el.classList.toggle('selected', idx === i));
+                document.getElementById('validate-btn').disabled = false;
+            };
+            optsDiv.appendChild(div);
+        });
+        document.getElementById('validate-btn').style.display = 'block';
+        document.getElementById('validate-btn').disabled = true;
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function validateAnswer() {
+        const q = gameQuestions[currentIdx];
+        const isCorrect = selectedIdx === q.correct;
+        if(isCorrect) score++;
+        history.push({q: q.q, user: q.options[selectedIdx], correct: q.options[q.correct], status: isCorrect});
+        document.querySelectorAll('.option')[q.correct].classList.add('correct');
+        if(!isCorrect) document.querySelectorAll('.option')[selectedIdx].classList.add('wrong');
+        document.getElementById('validate-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if(currentIdx < 65) showQuestion();
+        else finishGame();
+    }
+
+    async function finishGame() {
+        document.getElementById('quiz-ui').style.display = 'none';
+        document.getElementById('recap').style.display = 'block';
+        document.getElementById('final-score').innerText = `${score} / 65`;
+        document.getElementById('recap-list').innerHTML = history.map((h, i) => `
+            <div style="margin-bottom:15px; border-bottom:1px solid #334155; padding-bottom:10px;">
+                <b style="color:#94a3b8;">${i+1}. ${h.q}</b><br>
+                <span style="color:${h.status ? '#22c55e' : '#ef4444'}">Votre réponse : ${h.user}</span><br>
+                ${!h.status ? `<span style="color:#22c55e">Réponse attendue : ${h.correct}</span>` : ''}
+            </div>
+        `).join('');
+        await saveScore(playerName, score);
+    }
+
+    loadLeaderboard();
+</script>
+</body>
+</html>
