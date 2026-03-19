@@ -11,24 +11,18 @@
         #lobby { display: flex; padding: 40px; gap: 40px; }
         .leaderboard { flex: 1; background: #0f172a; padding: 20px; border-radius: 15px; border: 1px solid #334155; min-width: 250px; }
         .leaderboard h2 { font-size: 18px; color: var(--primary); margin: 0 0 15px 0; text-align: center; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-        .lb-list { list-style: none; padding: 0; margin: 0; font-size: 14px; }
+        .lb-list { list-style: none; padding: 0; margin: 0; font-size: 14px; max-height: 300px; overflow-y: auto; }
         .lb-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e293b; }
-        .lb-score { color: var(--primary); font-weight: bold; }
-        .main-menu { flex: 2; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .main-menu { flex: 2; text-align: center; }
+        h1 { color: var(--primary); font-size: 32px; margin-bottom: 10px; }
         input#username { width: 80%; padding: 15px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 18px; margin: 20px auto; text-align: center; outline: none; }
         .btn-start { background: var(--primary); color: #020617; padding: 18px 45px; border: none; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        #quiz-ui { display: none; padding: 40px; }
-        .header-quiz { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .badge { background: var(--primary); color: #020617; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 12px; }
-        .question-text { font-size: 22px; font-weight: 600; margin-bottom: 30px; line-height: 1.4; color: #fff; }
-        .options { display: grid; gap: 15px; }
-        .option { background: #334155; border: 2px solid transparent; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; font-size: 16px; }
+        #quiz-ui, #recap { display: none; padding: 40px; }
+        .option { background: #334155; border: 2px solid transparent; padding: 18px; border-radius: 15px; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
         .option.selected { border-color: var(--primary); background: #1e293b; }
-        .option.correct { background: var(--success) !important; color: white; font-weight: bold; }
+        .option.correct { background: var(--success) !important; color: white; }
         .option.wrong { background: var(--danger) !important; color: white; }
-        #recap { display: none; padding: 40px; text-align: center; }
-        .recap-scroll { text-align: left; max-height: 400px; overflow-y: auto; background: #0f172a; padding: 20px; border-radius: 15px; margin-top: 25px; border: 1px solid #334155; }
-        @media (max-width: 768px) { #lobby { flex-direction: column; } }
+        .recap-scroll { text-align: left; max-height: 350px; overflow-y: auto; background: #0f172a; padding: 20px; border-radius: 15px; margin-top: 25px; border: 1px solid #334155; }
     </style>
 </head>
 <body>
@@ -36,42 +30,38 @@
 <div id="game-container">
     <div id="lobby">
         <div class="leaderboard">
-            <h2>🏆 CLASSEMENT</h2>
-            <ul id="lb-list" class="lb-list"><li class="lb-item">Chargement...</li></ul>
+            <h2>🏆 TES SCORES</h2>
+            <ul id="lb-list" class="lb-list"></ul>
+            <div style="margin-top:20px; font-size:11px; text-align:center; color:#64748b;">
+                Parties mondiales finies : <br>
+                <b id="global-hits" style="color:var(--primary); font-size:14px;">...</b>
+            </div>
         </div>
         <div class="main-menu">
             <div style="font-size: 60px;">🛡️</div>
             <h1>SNS QUIZ GAME</h1>
-            <input type="text" id="username" placeholder="Ton pseudo..." maxlength="15">
+            <input type="text" id="username" placeholder="Pseudo admin..." maxlength="15">
             <button class="btn-start" onclick="startGame()">DÉMARRER</button>
         </div>
     </div>
 
     <div id="quiz-ui">
-        <div class="header-quiz">
-            <span id="category-badge" class="badge">SESSION</span>
-            <span id="progress-text" style="color:var(--primary); font-weight: bold;">1 / 65</span>
-        </div>
-        <div class="question-text" id="q-text"></div>
-        <div class="options" id="q-options"></div>
-        <div style="margin-top:40px;">
-            <button id="validate-btn" class="btn-start" style="width:100%" onclick="validateAnswer()" disabled>VALIDER</button>
-            <button id="next-btn" class="btn-start" style="width:100%; display:none; background:var(--success)" onclick="nextQuestion()">SUIVANT &raquo;</button>
-        </div>
+        <div id="q-text" style="font-size:22px; margin-bottom:30px; font-weight:600;"></div>
+        <div id="q-options"></div>
+        <button id="validate-btn" class="btn-start" style="width:100%; margin-top:20px;" onclick="validateAnswer()" disabled>VALIDER</button>
+        <button id="next-btn" class="btn-start" style="width:100%; margin-top:20px; display:none; background:var(--success)" onclick="nextQuestion()">SUIVANT &raquo;</button>
     </div>
 
     <div id="recap">
-        <h1>Résultats</h1>
-        <div id="final-score" style="font-size: 48px; color: var(--primary); margin: 20px 0;">0 / 65</div>
+        <h1>Analyse Terminée</h1>
+        <div id="final-score" style="font-size: 48px; color: var(--primary); margin: 10px 0;">0 / 65</div>
         <div class="recap-scroll" id="recap-list"></div>
-        <button class="btn-start" style="width:100%; margin-top:20px;" onclick="location.reload()">RETOUR AU LOBBY</button>
+        <button class="btn-start" style="width:100%; margin-top:20px;" onclick="location.reload()">RETOUR AU MENU</button>
     </div>
 </div>
 
 <script>
-    // Utilisation d'un bucket KVdb avec une clé unique pour éviter le 403
-    const API_URL = "https://kvdb.io/Hn1xhfgt9ftjtXFyxzjSjK/leaderboard_v2";
-
+    // --- QUESTIONS (Raccourci pour l'exemple, mets tes 65 ici) ---
     const allQuestions = [
         { cat: "Usine", q: "Combien de politiques de filtrage NAT locales peuvent être actives à la fois ?", options: ["1", "5", "10"], correct: 0 },
         { cat: "Usine", q: "Par défaut, la durée de vie d’un tunnel VPN SSL est de :", options: ["3 600s", "14 400s", "36 000s"], correct: 1 },
@@ -142,51 +132,36 @@
 
     let gameQuestions = [], currentIdx = 0, selectedIdx = null, score = 0, playerName = "", history = [];
 
-    // CHARGER LE CLASSEMENT
-    async function loadLeaderboard() {
-        const list = document.getElementById('lb-list');
+    // --- LEADERBOARD & COUNTER ---
+    async function initLobby() {
+        // Chargement classement local
+        const saved = JSON.parse(localStorage.getItem('sns_results_local') || '[]');
+        document.getElementById('lb-list').innerHTML = saved.sort((a,b)=>b.score - a.score).slice(0, 10).map(i => 
+            `<li class="lb-item"><span>${i.name}</span> <b>${i.score}/65</b></li>`).join('') || '<li class="lb-item">Aucun record</li>';
+
+        // CountAPI : On crée une clé unique "sns_quiz_final_count" pour tout le monde
         try {
-            const resp = await fetch(API_URL);
-            if (!resp.ok) { list.innerHTML = "Prêt pour les records !"; return; }
+            const resp = await fetch('https://api.countapi.xyz/get/sns_quiz_final_count/hits');
             const data = await resp.json();
-            list.innerHTML = data.sort((a,b)=>b.score-a.score).slice(0,10).map(i=>
-                `<li class="lb-item"><span>${i.name}</span> <span class="lb-score">${i.score}/65</span></li>`).join('');
-        } catch(e) { list.innerHTML = "En attente du premier score..."; }
+            document.getElementById('global-hits').innerText = data.value;
+        } catch(e) { 
+            // Si la clé n'existe pas, on l'initialise
+            fetch('https://api.countapi.xyz/create?namespace=sns_quiz_final_count&key=hits&value=0');
+            document.getElementById('global-hits').innerText = "0";
+        }
     }
 
-    // SAUVEGARDER (On utilise PUT pour écraser les restrictions de sécurité)
-    async function saveScore(name, finalScore) {
-        let lb = [];
-        try {
-            const resp = await fetch(API_URL);
-            if (resp.ok) lb = await resp.json();
-        } catch(e) {}
-        
-        lb.push({name, score: finalScore});
-        lb = lb.sort((a,b)=>b.score-a.score).slice(0,50);
-        
-        await fetch(API_URL, { 
-            method: 'PUT', 
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(lb) 
-        });
-    }
-
-    // MOTEUR DE JEU
     function startGame() {
         playerName = document.getElementById('username').value.trim();
         if(!playerName) return alert("Choisis un pseudo !");
         document.getElementById('lobby').style.display = 'none';
         document.getElementById('quiz-ui').style.display = 'block';
-        gameQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
-        currentIdx = 0; score = 0; history = [];
+        gameQuestions = [...allQuestions].sort(()=>Math.random()-0.5);
         showQuestion();
     }
 
     function showQuestion() {
         const q = gameQuestions[currentIdx];
-        document.getElementById('category-badge').innerText = q.cat;
-        document.getElementById('progress-text').innerText = `${currentIdx + 1} / 65`;
         document.getElementById('q-text').innerText = q.q;
         const optsDiv = document.getElementById('q-options');
         optsDiv.innerHTML = ''; selectedIdx = null;
@@ -194,9 +169,9 @@
             const div = document.createElement('div');
             div.className = 'option'; div.innerText = opt;
             div.onclick = () => {
-                if(document.getElementById('next-btn').style.display==='block') return;
+                if(document.getElementById('next-btn').style.display === 'block') return;
                 selectedIdx = i;
-                document.querySelectorAll('.option').forEach((el,idx)=>el.classList.toggle('selected', idx===i));
+                document.querySelectorAll('.option').forEach((el, idx) => el.classList.toggle('selected', idx === i));
                 document.getElementById('validate-btn').disabled = false;
             };
             optsDiv.appendChild(div);
@@ -223,22 +198,26 @@
         else finishGame();
     }
 
-    async function finishGame() {
+    function finishGame() {
         document.getElementById('quiz-ui').style.display = 'none';
         document.getElementById('recap').style.display = 'block';
         document.getElementById('final-score').innerText = score + " / 65";
-        document.getElementById('recap-list').innerHTML = history.map((h, i) => `
-            <div style="margin-bottom:15px; border-bottom:1px solid #334155; padding-bottom:10px;">
-                <b>${i+1}. ${h.q}</b><br>
-                <span style="color:${h.status ? '#22c55e' : '#ef4444'}">Ta réponse : ${h.user}</span><br>
-                ${!h.status ? `<span style="color:#22c55e">Correction : ${h.correct}</span>` : ''}
-            </div>
-        `).join('');
-        await saveScore(playerName, score);
-        loadLeaderboard();
+
+        // Sauvegarde locale (le classement s'affichera sur TON ordi)
+        let saved = JSON.parse(localStorage.getItem('sns_results_local') || '[]');
+        saved.push({name: playerName, score: score});
+        localStorage.setItem('sns_results_local', JSON.stringify(saved));
+
+        // Incrémenter le compteur mondial CountAPI
+        fetch('https://api.countapi.xyz/hit/sns_quiz_final_count/hits');
+
+        document.getElementById('recap-list').innerHTML = history.map(h => `
+            <div style="border-bottom:1px solid #334155; padding:5px;">
+                <b>${h.q}</b><br><span style="color:${h.status?'#22c55e':'#ef4444'}">${h.user}</span>
+            </div>`).join('');
     }
 
-    loadLeaderboard();
+    initLobby();
 </script>
 </body>
 </html>
