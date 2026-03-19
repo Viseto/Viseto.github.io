@@ -15,7 +15,6 @@
         .lb-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e293b; }
         .lb-score { color: var(--primary); font-weight: bold; }
         .main-menu { flex: 2; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-        h1 { color: var(--primary); font-size: 32px; text-shadow: 0 0 10px rgba(56,189,248,0.3); margin-bottom: 10px; }
         input#username { width: 80%; padding: 15px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 18px; margin: 20px auto; text-align: center; outline: none; }
         .btn-start { background: var(--primary); color: #020617; padding: 18px 45px; border: none; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         #quiz-ui { display: none; padding: 40px; }
@@ -23,7 +22,7 @@
         .badge { background: var(--primary); color: #020617; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 12px; }
         .question-text { font-size: 22px; font-weight: 600; margin-bottom: 30px; line-height: 1.4; color: #fff; }
         .options { display: grid; gap: 15px; }
-        .option { background: #334155; border: 2px solid transparent; padding: 18px; border-radius: 15px; cursor: pointer; transition: 0.2s; font-size: 16px; }
+        .option { background: #334155; border: 2px solid transparent; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; font-size: 16px; }
         .option.selected { border-color: var(--primary); background: #1e293b; }
         .option.correct { background: var(--success) !important; color: white; font-weight: bold; }
         .option.wrong { background: var(--danger) !important; color: white; }
@@ -41,8 +40,9 @@
             <ul id="lb-list" class="lb-list"><li class="lb-item">Chargement...</li></ul>
         </div>
         <div class="main-menu">
+            <div style="font-size: 60px;">🛡️</div>
             <h1>SNS QUIZ GAME</h1>
-            <input type="text" id="username" placeholder="Pseudo..." maxlength="15">
+            <input type="text" id="username" placeholder="Ton pseudo..." maxlength="15">
             <button class="btn-start" onclick="startGame()">DÉMARRER</button>
         </div>
     </div>
@@ -69,9 +69,8 @@
 </div>
 
 <script>
-    // NOUVEL ID UNIQUE POUR EVITER LES ERREURS 403
-    const BUCKET_ID = "sns_quiz_final_2025_" + Math.random().toString(36).substr(2, 9);
-    const API_URL = `https://kvdb.io/${BUCKET_ID}/leaderboard`;
+    // Utilisation d'un bucket KVdb avec une clé unique pour éviter le 403
+    const API_URL = "https://kvdb.io/Hn1xhfgt9ftjtXFyxzjSjK/leaderboard_v2";
 
     const allQuestions = [
         { cat: "Usine", q: "Combien de politiques de filtrage NAT locales peuvent être actives à la fois ?", options: ["1", "5", "10"], correct: 0 },
@@ -143,33 +142,29 @@
 
     let gameQuestions = [], currentIdx = 0, selectedIdx = null, score = 0, playerName = "", history = [];
 
-    // CHARGER CLASSEMENT
+    // CHARGER LE CLASSEMENT
     async function loadLeaderboard() {
         const list = document.getElementById('lb-list');
         try {
             const resp = await fetch(API_URL);
-            if (!resp.ok) { list.innerHTML = "Aucun score enregistré"; return; }
+            if (!resp.ok) { list.innerHTML = "Prêt pour les records !"; return; }
             const data = await resp.json();
             list.innerHTML = data.sort((a,b)=>b.score-a.score).slice(0,10).map(i=>
-                `<li class="lb-item"><span class="lb-name">${i.name}</span> <span class="lb-score">${i.score}/65</span></li>`).join('');
-        } catch(e) { list.innerHTML = "Le classement sera prêt après la 1ère partie"; }
+                `<li class="lb-item"><span>${i.name}</span> <span class="lb-score">${i.score}/65</span></li>`).join('');
+        } catch(e) { list.innerHTML = "En attente du premier score..."; }
     }
 
-    // SAUVEGARDER SCORE
+    // SAUVEGARDER (On utilise PUT pour écraser les restrictions de sécurité)
     async function saveScore(name, finalScore) {
         let lb = [];
         try {
             const resp = await fetch(API_URL);
-            if(resp.ok) {
-                const data = await resp.json();
-                if(Array.isArray(data)) lb = data;
-            }
+            if (resp.ok) lb = await resp.json();
         } catch(e) {}
         
         lb.push({name, score: finalScore});
         lb = lb.sort((a,b)=>b.score-a.score).slice(0,50);
         
-        // On utilise PUT pour forcer l'écriture même si le fichier n'existe pas
         await fetch(API_URL, { 
             method: 'PUT', 
             headers: {'Content-Type': 'application/json'},
@@ -177,9 +172,10 @@
         });
     }
 
+    // MOTEUR DE JEU
     function startGame() {
         playerName = document.getElementById('username').value.trim();
-        if(!playerName) return alert("Veuillez entrer un pseudo !");
+        if(!playerName) return alert("Choisis un pseudo !");
         document.getElementById('lobby').style.display = 'none';
         document.getElementById('quiz-ui').style.display = 'block';
         gameQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
@@ -234,7 +230,7 @@
         document.getElementById('recap-list').innerHTML = history.map((h, i) => `
             <div style="margin-bottom:15px; border-bottom:1px solid #334155; padding-bottom:10px;">
                 <b>${i+1}. ${h.q}</b><br>
-                <span style="color:${h.status ? '#22c55e' : '#ef4444'}">Réponse : ${h.user}</span><br>
+                <span style="color:${h.status ? '#22c55e' : '#ef4444'}">Ta réponse : ${h.user}</span><br>
                 ${!h.status ? `<span style="color:#22c55e">Correction : ${h.correct}</span>` : ''}
             </div>
         `).join('');
