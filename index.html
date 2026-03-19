@@ -42,7 +42,7 @@
         <div class="main-menu">
             <div style="font-size: 60px;">🛡️</div>
             <h1>SNS QUIZ GAME</h1>
-            <input type="text" id="username" placeholder="Ton pseudo..." maxlength="15">
+            <input type="text" id="username" placeholder="Pseudo..." maxlength="15">
             <button class="btn-start" onclick="startGame()">JOUER</button>
         </div>
     </div>
@@ -61,16 +61,15 @@
     </div>
 
     <div id="recap">
-        <h1>Score : <span id="final-score">0</span> / 65</h1>
+        <h1>Analyse Terminée</h1>
+        <h2 id="final-score-text" style="font-size: 40px; color: var(--primary);">Score : 0 / 65</h2>
         <div class="recap-scroll" id="recap-list"></div>
-        <button class="btn-start" style="margin-top:30px; width:100%" onclick="location.reload()">RETOUR</button>
+        <button class="btn-start" style="margin-top:30px; width:100%" onclick="location.reload()">RETOUR AU LOBBY</button>
     </div>
 </div>
 
 <script>
-    // ID DE TON BUCKET KVDB
-    const BUCKET_ID = "Hn1xhfgt9ftjtXFyxzjSjK";
-    const API_URL = `https://kvdb.io/${BUCKET_ID}/leaderboard`;
+    const API_URL = "https://kvdb.io/Hn1xhfgt9ftjtXFyxzjSjK/leaderboard";
 
     const allQuestions = [
         { cat: "Usine", q: "Combien de politiques de filtrage NAT locales peuvent être actives à la fois ?", options: ["1", "5", "10"], correct: 0 },
@@ -89,7 +88,7 @@
         { cat: "Admin", q: "Le firewall peut être serveur DHCP ?", options: ["Vrai", "Faux"], correct: 0 },
         { cat: "Admin", q: "Navigateurs supportés :", options: ["Firefox, Edge, Chrome", "Opera, Safari", "Uniquement Firefox"], correct: 0 },
         { cat: "Logs", q: "Modifier le % d'espace disque par famille de traces ?", options: ["Oui", "Non"], correct: 0 },
-        { cat: "Logs", q: "Logs pleins : que se passe-t-is ?", options: ["Arrêt firewall", "Rotation automatique", "Envoi d'un ping"], correct: 1 },
+        { cat: "Logs", q: "Logs pleins : que se passe-t-il ?", options: ["Arrêt firewall", "Rotation automatique", "Envoi d'un ping"], correct: 1 },
         { cat: "Logs", q: "Visualiser les journaux via Wireshark ?", options: ["Oui", "Non (Interface Admin)"], correct: 1 },
         { cat: "Logs", q: "Le RGPD a-t-il un impact sur la gestion des logs ?", options: ["Vrai", "Faux"], correct: 0 },
         { cat: "Logs", q: "Arrêter l’écriture des événements pour une catégorie ?", options: ["Vrai", "Faux"], correct: 0 },
@@ -144,13 +143,16 @@
 
     async function loadLeaderboard() {
         const list = document.getElementById('lb-list');
+        list.innerHTML = "Chargement...";
         try {
             const resp = await fetch(API_URL);
-            if (!resp.ok) { list.innerHTML = "Aucun score"; return; }
+            if (!resp.ok) { list.innerHTML = "Aucun score (Prêt)"; return; }
             const data = await resp.json();
-            list.innerHTML = data.sort((a,b)=>b.score-a.score).slice(0,10).map(i=>
-                `<li class="lb-item"><span class="lb-name">${i.name}</span> <span class="lb-score">${i.score}/65</span></li>`).join('');
-        } catch(e) { list.innerHTML = "Prêt !"; }
+            if (Array.isArray(data)) {
+                list.innerHTML = data.sort((a,b)=>b.score-a.score).slice(0,10).map(i=>
+                    `<li class="lb-item"><span class="lb-name">${i.name}</span> <span class="lb-score">${i.score}/65</span></li>`).join('');
+            }
+        } catch(e) { list.innerHTML = "Lancer une partie !"; }
     }
 
     async function saveScore(name, finalScore) {
@@ -166,13 +168,17 @@
         lb.push({name, score: finalScore});
         lb = lb.sort((a,b)=>b.score-a.score).slice(0,50);
         
-        // Utilisation de PUT pour créer/écraser proprement
-        await fetch(API_URL, { 
-            method: 'PUT', 
-            mode: 'cors',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(lb) 
-        });
+        // Tentative d'envoi
+        try {
+            await fetch(API_URL, { 
+                method: 'PUT', 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(lb) 
+            });
+        } catch(err) {
+            console.error("Cloud Error - Stockage local utilisé");
+            localStorage.setItem('local_scores', JSON.stringify(lb));
+        }
     }
 
     function startGame() {
@@ -228,9 +234,18 @@
     async function finishGame() {
         document.getElementById('quiz-ui').style.display = 'none';
         document.getElementById('recap').style.display = 'block';
-        document.getElementById('final-score').innerText = score;
+        document.getElementById('final-score-text').innerText = `Score : ${score} / 65`;
         document.getElementById('recap-list').innerHTML = history.map((h, i) => `
             <div style="margin-bottom:15px; border-bottom:1px solid #334155; padding-bottom:10px;">
                 <b>${i+1}. ${h.q}</b><br>
                 <span style="color:${h.status ? '#22c55e' : '#ef4444'}">Réponse : ${h.user}</span><br>
-                ${!h.status ? `<span style="color:#22
+                ${!h.status ? `<span style="color:#22c55e">Solution : ${h.correct}</span>` : ''}
+            </div>
+        `).join('');
+        await saveScore(playerName, score);
+    }
+
+    loadLeaderboard();
+</script>
+</body>
+</html>
