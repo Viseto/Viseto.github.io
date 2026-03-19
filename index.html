@@ -8,8 +8,6 @@
         :root { --primary: #38bdf8; --success: #22c55e; --danger: #ef4444; --bg: #020617; --card: #1e293b; --text: #f8fafc; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         #game-container { background: var(--card); width: 95%; max-width: 900px; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid #334155; }
-        
-        /* LOBBY */
         #lobby { display: flex; padding: 40px; gap: 40px; }
         .leaderboard { flex: 1; background: #0f172a; padding: 20px; border-radius: 15px; border: 1px solid #334155; min-width: 250px; }
         .leaderboard h2 { font-size: 18px; color: var(--primary); margin-top: 0; text-align: center; border-bottom: 1px solid #334155; padding-bottom: 10px; text-transform: uppercase; }
@@ -17,30 +15,22 @@
         .lb-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e293b; }
         .lb-name { font-weight: bold; color: #94a3b8; }
         .lb-score { color: var(--primary); font-weight: bold; }
-
         .main-menu { flex: 2; text-align: center; display: flex; flex-direction: column; justify-content: center; }
         h1 { color: var(--primary); font-size: 32px; text-shadow: 0 0 10px rgba(56,189,248,0.3); margin-bottom: 10px; }
         input#username { width: 80%; padding: 15px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 18px; margin: 20px auto; text-align: center; outline: none; }
         .btn-start { background: var(--primary); color: #020617; padding: 18px 45px; border: none; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-start:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(56,189,248,0.5); }
-
-        /* QUIZ */
         #quiz-ui { display: none; padding: 40px; }
         .header-quiz { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .badge { background: var(--primary); color: #020617; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 12px; }
         .question-text { font-size: 22px; font-weight: 600; margin-bottom: 30px; line-height: 1.4; color: #fff; }
         .options { display: grid; gap: 15px; }
         .option { background: #334155; border: 2px solid transparent; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; font-size: 16px; }
-        .option:hover { background: #475569; }
         .option.selected { border-color: var(--primary); background: #1e293b; }
         .option.correct { background: var(--success) !important; color: white; font-weight: bold; }
         .option.wrong { background: var(--danger) !important; color: white; }
-        
-        /* RECAP */
         #recap { display: none; padding: 40px; text-align: center; }
         .score-val { font-size: 60px; font-weight: bold; color: var(--primary); margin: 10px 0; }
         .recap-scroll { text-align: left; max-height: 400px; overflow-y: auto; background: #0f172a; padding: 20px; border-radius: 15px; margin-top: 25px; border: 1px solid #334155; }
-
         @media (max-width: 768px) { #lobby { flex-direction: column; } }
     </style>
 </head>
@@ -50,9 +40,7 @@
     <div id="lobby">
         <div class="leaderboard">
             <h2>🏆 TOP 10 SCORES</h2>
-            <ul id="lb-list" class="lb-list">
-                <li class="lb-item">Chargement...</li>
-            </ul>
+            <ul id="lb-list" class="lb-list"></ul>
         </div>
         <div class="main-menu">
             <div style="font-size: 60px;">🛡️</div>
@@ -155,44 +143,31 @@
         { cat: "Objets", q: "Objet FQDN : adresse via DNS ?", options: ["Vrai", "Faux"], correct: 0 }
     ];
 
-    let gameQuestions = [];
-    let currentIdx = 0;
-    let selectedIdx = null;
-    let score = 0;
-    let playerName = "";
-    let history = [];
+    let gameQuestions = [], currentIdx = 0, selectedIdx = null, score = 0, playerName = "", history = [];
 
     async function loadLeaderboard() {
         const list = document.getElementById('lb-list');
+        list.innerHTML = "Chargement...";
         try {
             const resp = await fetch(API_URL);
-            if (resp.status === 404) {
-                list.innerHTML = '<li class="lb-item">Soyez le premier !</li>';
-                return;
-            }
-            const lb = await resp.json();
-            if (Array.isArray(lb)) {
-                list.innerHTML = lb.sort((a,b) => b.score - a.score).slice(0, 10).map(i => 
-                    `<li class="lb-item"><span class="lb-name">${i.name}</span> <span class="lb-score">${i.score}/65</span></li>`
-                ).join('') || '<li class="lb-item">Soyez le premier !</li>';
-            }
-        } catch (e) {
-            list.innerHTML = '<li class="lb-item">Leaderboard prêt</li>';
-        }
+            if (!resp.ok) { list.innerHTML = "En attente du premier score"; return; }
+            const data = await resp.json();
+            list.innerHTML = data.sort((a,b)=>b.score-a.score).slice(0,10).map(i=>
+                `<li class="lb-item"><span class="lb-name">${i.name}</span> <span class="lb-score">${i.score}/65</span></li>`).join('');
+        } catch(e) { list.innerHTML = "Prêt !"; }
     }
 
     async function saveScore(name, finalScore) {
+        let lb = [];
         try {
-            let lb = [];
             const resp = await fetch(API_URL);
-            if (resp.ok) {
-                const data = await resp.json();
-                if (Array.isArray(data)) lb = data;
-            }
-            lb.push({ name, score: finalScore });
-            lb = lb.sort((a,b) => b.score - a.score).slice(0, 50);
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify(lb) });
-        } catch (e) { console.error("Erreur API", e); }
+            if(resp.ok) lb = await resp.json();
+        } catch(e) {}
+        
+        lb.push({name, score: finalScore});
+        lb = lb.sort((a,b)=>b.score-a.score).slice(0,50);
+        
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify(lb) });
     }
 
     function startGame() {
@@ -211,16 +186,14 @@
         document.getElementById('progress-text').innerText = `${currentIdx + 1} / 65`;
         document.getElementById('q-text').innerText = q.q;
         const optsDiv = document.getElementById('q-options');
-        optsDiv.innerHTML = '';
-        selectedIdx = null;
+        optsDiv.innerHTML = ''; selectedIdx = null;
         q.options.forEach((opt, i) => {
             const div = document.createElement('div');
-            div.className = 'option';
-            div.innerText = opt;
+            div.className = 'option'; div.innerText = opt;
             div.onclick = () => {
-                if(document.getElementById('next-btn').style.display === 'block') return;
+                if(document.getElementById('next-btn').style.display==='block') return;
                 selectedIdx = i;
-                document.querySelectorAll('.option').forEach((el, idx) => el.classList.toggle('selected', idx === i));
+                document.querySelectorAll('.option').forEach((el,idx)=>el.classList.toggle('selected', idx===i));
                 document.getElementById('validate-btn').disabled = false;
             };
             optsDiv.appendChild(div);
@@ -253,12 +226,13 @@
         document.getElementById('final-score').innerText = `${score} / 65`;
         document.getElementById('recap-list').innerHTML = history.map((h, i) => `
             <div style="margin-bottom:15px; border-bottom:1px solid #334155; padding-bottom:10px;">
-                <b>${i+1}. ${h.q}</b><br>
+                <b style="color:#94a3b8;">${i+1}. ${h.q}</b><br>
                 <span style="color:${h.status ? '#22c55e' : '#ef4444'}">Réponse : ${h.user}</span><br>
                 ${!h.status ? `<span style="color:#22c55e">Solution : ${h.correct}</span>` : ''}
             </div>
         `).join('');
         await saveScore(playerName, score);
+        loadLeaderboard();
     }
 
     loadLeaderboard();
