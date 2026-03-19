@@ -16,12 +16,11 @@
         .lb-list { list-style: none; padding: 0; margin: 0; font-size: 14px; }
         .lb-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e293b; }
         .lb-name { font-weight: bold; color: #94a3b8; }
-        .lb-score { color: var(--primary); }
+        .lb-score { color: var(--primary); font-weight: bold; }
 
         .main-menu { flex: 2; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-        h1 { color: var(--primary); font-size: 32px; text-shadow: 0 0 10px rgba(56,189,248,0.3); }
+        h1 { color: var(--primary); font-size: 32px; text-shadow: 0 0 10px rgba(56,189,248,0.3); margin-bottom: 10px; }
         input#username { width: 80%; padding: 15px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 18px; margin: 20px auto; text-align: center; outline: none; }
-        input#username:focus { border-color: var(--primary); }
         .btn-start { background: var(--primary); color: #020617; padding: 18px 45px; border: none; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-start:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(56,189,248,0.5); }
 
@@ -52,15 +51,15 @@
         <div class="leaderboard">
             <h2>🏆 TOP 10 SCORES</h2>
             <ul id="lb-list" class="lb-list">
-                <li class="lb-item">Chargement du cloud...</li>
+                <li class="lb-item">Chargement...</li>
             </ul>
         </div>
         <div class="main-menu">
             <div style="font-size: 60px;">🛡️</div>
             <h1>SNS QUIZ GAME</h1>
-            <p>Préparez la certification Stormshield</p>
-            <input type="text" id="username" placeholder="Pseudo de l'admin..." maxlength="15">
-            <button class="btn-start" onclick="startGame()">DÉMARRER LA SESSION</button>
+            <p>Certification Stormshield 2025</p>
+            <input type="text" id="username" placeholder="Pseudo..." maxlength="15">
+            <button class="btn-start" onclick="startGame()">JOUER</button>
         </div>
     </div>
 
@@ -73,21 +72,19 @@
         <div class="options" id="q-options"></div>
         <div style="margin-top:40px;">
             <button id="validate-btn" class="btn-start" style="width:100%" onclick="validateAnswer()" disabled>VALIDER</button>
-            <button id="next-btn" class="btn-start" style="width:100%; display:none; background:var(--success)" onclick="nextQuestion()">QUESTION SUIVANTE &raquo;</button>
+            <button id="next-btn" class="btn-start" style="width:100%; display:none; background:var(--success)" onclick="nextQuestion()">SUIVANT &raquo;</button>
         </div>
     </div>
 
     <div id="recap">
         <h1>Analyse Terminée</h1>
         <div id="final-score" class="score-val">0 / 65</div>
-        <p id="player-rank-msg"></p>
         <div class="recap-scroll" id="recap-list"></div>
-        <button class="btn-start" style="margin-top:30px; width:100%" onclick="location.reload()">RETOUR AU LOBBY</button>
+        <button class="btn-start" style="margin-top:30px; width:100%" onclick="location.reload()">RETOUR</button>
     </div>
 </div>
 
 <script>
-    // Configuration KVdb
     const API_URL = "https://kvdb.io/Hn1xhfgt9ftjtXFyxzjSjK/leaderboard";
 
     const allQuestions = [
@@ -165,18 +162,22 @@
     let playerName = "";
     let history = [];
 
-    // LEADERBOARD API
     async function loadLeaderboard() {
         const list = document.getElementById('lb-list');
         try {
             const resp = await fetch(API_URL);
-            if (!resp.ok) throw new Error();
+            if (resp.status === 404) {
+                list.innerHTML = '<li class="lb-item">Soyez le premier !</li>';
+                return;
+            }
             const lb = await resp.json();
-            list.innerHTML = lb.sort((a,b) => b.score - a.score).slice(0, 10).map(i => 
-                `<li class="lb-item"><span class="lb-name">${i.name}</span> <span class="lb-score">${i.score}/65</span></li>`
-            ).join('') || '<li class="lb-item">Soyez le premier !</li>';
+            if (Array.isArray(lb)) {
+                list.innerHTML = lb.sort((a,b) => b.score - a.score).slice(0, 10).map(i => 
+                    `<li class="lb-item"><span class="lb-name">${i.name}</span> <span class="lb-score">${i.score}/65</span></li>`
+                ).join('') || '<li class="lb-item">Soyez le premier !</li>';
+            }
         } catch (e) {
-            list.innerHTML = '<li class="lb-item">Prêt pour les records</li>';
+            list.innerHTML = '<li class="lb-item">Leaderboard prêt</li>';
         }
     }
 
@@ -184,20 +185,23 @@
         try {
             let lb = [];
             const resp = await fetch(API_URL);
-            if (resp.ok) lb = await resp.json();
+            if (resp.ok) {
+                const data = await resp.json();
+                if (Array.isArray(data)) lb = data;
+            }
             lb.push({ name, score: finalScore });
             lb = lb.sort((a,b) => b.score - a.score).slice(0, 50);
             await fetch(API_URL, { method: 'POST', body: JSON.stringify(lb) });
-        } catch (e) { console.error("API error", e); }
+        } catch (e) { console.error("Erreur API", e); }
     }
 
-    // ENGINE
     function startGame() {
         playerName = document.getElementById('username').value.trim();
-        if(!playerName) return alert("Veuillez entrer un pseudo !");
+        if(!playerName) return alert("Pseudo requis !");
         document.getElementById('lobby').style.display = 'none';
         document.getElementById('quiz-ui').style.display = 'block';
         gameQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
+        currentIdx = 0; score = 0; history = [];
         showQuestion();
     }
 
@@ -249,9 +253,9 @@
         document.getElementById('final-score').innerText = `${score} / 65`;
         document.getElementById('recap-list').innerHTML = history.map((h, i) => `
             <div style="margin-bottom:15px; border-bottom:1px solid #334155; padding-bottom:10px;">
-                <b style="color:#94a3b8;">${i+1}. ${h.q}</b><br>
-                <span style="color:${h.status ? '#22c55e' : '#ef4444'}">Votre réponse : ${h.user}</span><br>
-                ${!h.status ? `<span style="color:#22c55e">Réponse attendue : ${h.correct}</span>` : ''}
+                <b>${i+1}. ${h.q}</b><br>
+                <span style="color:${h.status ? '#22c55e' : '#ef4444'}">Réponse : ${h.user}</span><br>
+                ${!h.status ? `<span style="color:#22c55e">Solution : ${h.correct}</span>` : ''}
             </div>
         `).join('');
         await saveScore(playerName, score);
