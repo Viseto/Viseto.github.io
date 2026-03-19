@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNS Certification Game</title>
+    <title>SNS QUIZ GAME - Stormshield</title>
     <style>
         :root { --primary: #38bdf8; --success: #22c55e; --danger: #ef4444; --bg: #020617; --card: #1e293b; --text: #f8fafc; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         #game-container { background: var(--card); width: 95%; max-width: 900px; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid #334155; }
         #lobby { display: flex; padding: 40px; gap: 40px; }
         .leaderboard { flex: 1; background: #0f172a; padding: 20px; border-radius: 15px; border: 1px solid #334155; min-width: 250px; }
-        .leaderboard h2 { font-size: 18px; color: var(--primary); margin-top: 0; text-align: center; border-bottom: 1px solid #334155; padding-bottom: 10px; text-transform: uppercase; }
+        .leaderboard h2 { font-size: 18px; color: var(--primary); margin: 0 0 10px 0; text-align: center; border-bottom: 1px solid #334155; padding-bottom: 10px; }
         .lb-list { list-style: none; padding: 0; margin: 0; font-size: 14px; }
         .lb-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e293b; }
-        .lb-name { font-weight: bold; color: #94a3b8; }
-        .lb-score { color: var(--primary); font-weight: bold; }
-        .main-menu { flex: 2; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-        h1 { color: var(--primary); font-size: 32px; text-shadow: 0 0 10px rgba(56,189,248,0.3); margin-bottom: 10px; }
+        .main-menu { flex: 2; text-align: center; }
+        h1 { color: var(--primary); font-size: 32px; margin-bottom: 10px; }
         input#username { width: 80%; padding: 15px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 18px; margin: 20px auto; text-align: center; outline: none; }
         .btn-start { background: var(--primary); color: #020617; padding: 18px 45px; border: none; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         #quiz-ui { display: none; padding: 40px; }
@@ -24,13 +22,12 @@
         .badge { background: var(--primary); color: #020617; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 12px; }
         .question-text { font-size: 22px; font-weight: 600; margin-bottom: 30px; line-height: 1.4; color: #fff; }
         .options { display: grid; gap: 15px; }
-        .option { background: #334155; border: 2px solid transparent; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; font-size: 16px; }
-        .option.selected { border-color: var(--primary); background: #1e293b; }
-        .option.correct { background: var(--success) !important; color: white; font-weight: bold; }
+        .option { background: #334155; border: 2px solid transparent; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; }
+        .option.selected { border-color: var(--primary); }
+        .option.correct { background: var(--success) !important; color: white; }
         .option.wrong { background: var(--danger) !important; color: white; }
         #recap { display: none; padding: 40px; text-align: center; }
-        .score-val { font-size: 60px; font-weight: bold; color: var(--primary); margin: 10px 0; }
-        .recap-scroll { text-align: left; max-height: 400px; overflow-y: auto; background: #0f172a; padding: 20px; border-radius: 15px; margin-top: 25px; border: 1px solid #334155; }
+        .recap-scroll { text-align: left; max-height: 400px; overflow-y: auto; background: #0f172a; padding: 20px; border-radius: 15px; margin-top: 25px; }
         @media (max-width: 768px) { #lobby { flex-direction: column; } }
     </style>
 </head>
@@ -39,14 +36,13 @@
 <div id="game-container">
     <div id="lobby">
         <div class="leaderboard">
-            <h2>🏆 TOP 10 SCORES</h2>
+            <h2>🏆 TOP 10</h2>
             <ul id="lb-list" class="lb-list"></ul>
         </div>
         <div class="main-menu">
             <div style="font-size: 60px;">🛡️</div>
             <h1>SNS QUIZ GAME</h1>
-            <p>Certification Stormshield 2025</p>
-            <input type="text" id="username" placeholder="Pseudo..." maxlength="15">
+            <input type="text" id="username" placeholder="Ton pseudo..." maxlength="15">
             <button class="btn-start" onclick="startGame()">JOUER</button>
         </div>
     </div>
@@ -54,7 +50,7 @@
     <div id="quiz-ui">
         <div class="header-quiz">
             <span id="category-badge" class="badge">SESSION</span>
-            <span id="progress-text" style="font-weight:bold; color:var(--primary);">1 / 65</span>
+            <span id="progress-text" style="color:var(--primary);">1 / 65</span>
         </div>
         <div class="question-text" id="q-text"></div>
         <div class="options" id="q-options"></div>
@@ -65,15 +61,16 @@
     </div>
 
     <div id="recap">
-        <h1>Analyse Terminée</h1>
-        <div id="final-score" class="score-val">0 / 65</div>
+        <h1>Score : <span id="final-score">0</span> / 65</h1>
         <div class="recap-scroll" id="recap-list"></div>
         <button class="btn-start" style="margin-top:30px; width:100%" onclick="location.reload()">RETOUR</button>
     </div>
 </div>
 
 <script>
-    const API_URL = "https://kvdb.io/Hn1xhfgt9ftjtXFyxzjSjK/leaderboard";
+    // ID DE TON BUCKET KVDB
+    const BUCKET_ID = "Hn1xhfgt9ftjtXFyxzjSjK";
+    const API_URL = `https://kvdb.io/${BUCKET_ID}/leaderboard`;
 
     const allQuestions = [
         { cat: "Usine", q: "Combien de politiques de filtrage NAT locales peuvent être actives à la fois ?", options: ["1", "5", "10"], correct: 0 },
@@ -92,7 +89,7 @@
         { cat: "Admin", q: "Le firewall peut être serveur DHCP ?", options: ["Vrai", "Faux"], correct: 0 },
         { cat: "Admin", q: "Navigateurs supportés :", options: ["Firefox, Edge, Chrome", "Opera, Safari", "Uniquement Firefox"], correct: 0 },
         { cat: "Logs", q: "Modifier le % d'espace disque par famille de traces ?", options: ["Oui", "Non"], correct: 0 },
-        { cat: "Logs", q: "Logs pleins : que se passe-t-il ?", options: ["Arrêt firewall", "Rotation automatique", "Envoi d'un ping"], correct: 1 },
+        { cat: "Logs", q: "Logs pleins : que se passe-t-is ?", options: ["Arrêt firewall", "Rotation automatique", "Envoi d'un ping"], correct: 1 },
         { cat: "Logs", q: "Visualiser les journaux via Wireshark ?", options: ["Oui", "Non (Interface Admin)"], correct: 1 },
         { cat: "Logs", q: "Le RGPD a-t-il un impact sur la gestion des logs ?", options: ["Vrai", "Faux"], correct: 0 },
         { cat: "Logs", q: "Arrêter l’écriture des événements pour une catégorie ?", options: ["Vrai", "Faux"], correct: 0 },
@@ -147,10 +144,9 @@
 
     async function loadLeaderboard() {
         const list = document.getElementById('lb-list');
-        list.innerHTML = "Chargement...";
         try {
             const resp = await fetch(API_URL);
-            if (!resp.ok) { list.innerHTML = "En attente du premier score"; return; }
+            if (!resp.ok) { list.innerHTML = "Aucun score"; return; }
             const data = await resp.json();
             list.innerHTML = data.sort((a,b)=>b.score-a.score).slice(0,10).map(i=>
                 `<li class="lb-item"><span class="lb-name">${i.name}</span> <span class="lb-score">${i.score}/65</span></li>`).join('');
@@ -161,13 +157,22 @@
         let lb = [];
         try {
             const resp = await fetch(API_URL);
-            if(resp.ok) lb = await resp.json();
+            if(resp.ok) {
+                const data = await resp.json();
+                if(Array.isArray(data)) lb = data;
+            }
         } catch(e) {}
         
         lb.push({name, score: finalScore});
         lb = lb.sort((a,b)=>b.score-a.score).slice(0,50);
         
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify(lb) });
+        // Utilisation de PUT pour créer/écraser proprement
+        await fetch(API_URL, { 
+            method: 'PUT', 
+            mode: 'cors',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(lb) 
+        });
     }
 
     function startGame() {
@@ -223,19 +228,9 @@
     async function finishGame() {
         document.getElementById('quiz-ui').style.display = 'none';
         document.getElementById('recap').style.display = 'block';
-        document.getElementById('final-score').innerText = `${score} / 65`;
+        document.getElementById('final-score').innerText = score;
         document.getElementById('recap-list').innerHTML = history.map((h, i) => `
             <div style="margin-bottom:15px; border-bottom:1px solid #334155; padding-bottom:10px;">
-                <b style="color:#94a3b8;">${i+1}. ${h.q}</b><br>
+                <b>${i+1}. ${h.q}</b><br>
                 <span style="color:${h.status ? '#22c55e' : '#ef4444'}">Réponse : ${h.user}</span><br>
-                ${!h.status ? `<span style="color:#22c55e">Solution : ${h.correct}</span>` : ''}
-            </div>
-        `).join('');
-        await saveScore(playerName, score);
-        loadLeaderboard();
-    }
-
-    loadLeaderboard();
-</script>
-</body>
-</html>
+                ${!h.status ? `<span style="color:#22
