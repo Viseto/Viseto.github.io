@@ -3,186 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNS Certification - Analyse Technique</title>
+    <title>SNS Certification - Entraînement</title>
     <style>
+        /* Thème "Eye-Care" : Couleurs douces et reposantes pour l'écran */
         :root {
-            --primary: #0ea5e9;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f8fafc;
-            --text-dim: #94a3b8;
+            --bg-page: #0f172a;        /* Bleu nuit très sombre */
+            --bg-card: #1e293b;        /* Ardoise sombre */
+            --bg-option: #334155;      /* Ardoise claire */
+            --bg-option-hover: #475569;
+            --primary: #38bdf8;        /* Bleu ciel doux */
+            --success: #10b981;        /* Vert émeraude (moins agressif que le vert pur) */
+            --danger: #ef4444;         /* Rouge corail */
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
         }
 
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
-        #game-container { background: var(--card); width: 100%; max-width: 800px; border-radius: 1.5rem; padding: 2rem; border: 1px solid #334155; align-self: center; }
-
-        .progress-bar { height: 6px; background: #334155; border-radius: 10px; margin: 1rem 0 2rem; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
-
-        .question-box h2 { font-size: 1.3rem; line-height: 1.5; margin-bottom: 1.5rem; }
-        .options-grid { display: grid; gap: 0.75rem; }
-
-        .option {
-            background: #334155; padding: 1rem; border-radius: 0.75rem; cursor: pointer;
-            border: 2px solid transparent; transition: 0.2s; font-size: 1rem;
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .option.selected { border-color: var(--primary); }
-        .option.correct { background: var(--success) !important; color: white; border-color: #16a34a; }
-        .option.wrong { background: var(--danger) !important; color: white; border-color: #dc2626; }
 
-        /* ZONE EXPLICATION */
-        #analysis-box {
-            display: none; background: #0f172a; border-radius: 1rem; padding: 1.5rem;
-            margin-top: 1.5rem; border: 1px solid var(--primary); animation: fadeIn 0.4s;
+        #app-container {
+            background-color: var(--bg-card);
+            width: 100%;
+            max-width: 850px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid #334155;
+            padding: 40px;
+            box-sizing: border-box;
         }
-        .analysis-title { font-weight: 800; color: var(--primary); text-transform: uppercase; font-size: 0.8rem; margin-bottom: 0.5rem; display: block; }
-        .analysis-text { font-size: 0.95rem; line-height: 1.6; color: #cbd5e1; }
+
+        /* LOBBY */
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { color: var(--primary); font-size: 2.5rem; margin: 0 0 10px 0; }
+        .header p { color: var(--text-muted); font-size: 1.1rem; margin: 0; }
+
+        .stats-container {
+            display: flex; justify-content: space-around; background: var(--bg-page);
+            padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #334155;
+        }
+        .stat-box { text-align: center; }
+        .stat-box span { display: block; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-box strong { font-size: 1.8rem; color: var(--primary); }
 
         .btn {
-            width: 100%; padding: 1rem; border-radius: 0.75rem; border: none;
-            font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 1.5rem;
+            width: 100%; background: var(--primary); color: #020617; padding: 16px;
+            border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold;
+            cursor: pointer; transition: 0.2s;
         }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-next { background: #334155; color: white; display: none; }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-next { background: var(--success); color: white; display: none; margin-top: 15px; }
+
+        /* QUIZ */
+        .quiz-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .badge { background: rgba(56, 189, 248, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-weight: bold; border: 1px solid rgba(56, 189, 248, 0.2); }
+        .progress-text { color: var(--text-muted); font-weight: bold; }
+        
+        .progress-bar { width: 100%; height: 8px; background: var(--bg-page); border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+
+        .question { font-size: 1.4rem; font-weight: 600; line-height: 1.5; margin-bottom: 30px; }
+        
+        .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+        .option {
+            background: var(--bg-option); padding: 18px 20px; border-radius: 12px;
+            cursor: pointer; border: 2px solid transparent; transition: 0.2s;
+            font-size: 1.1rem; display: flex; align-items: center;
+        }
+        .option:hover { background: var(--bg-option-hover); }
+        .option.selected { border-color: var(--primary); background: rgba(56, 189, 248, 0.05); }
+        .option.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .option.wrong { background: var(--danger) !important; color: white; border-color: var(--danger); }
+
+        /* EXPLICATION */
+        .explanation-box {
+            display: none; background: var(--bg-page); border-left: 4px solid var(--primary);
+            padding: 20px; border-radius: 0 12px 12px 0; margin-bottom: 25px;
+            animation: fadeIn 0.4s ease;
+        }
+        .explanation-title { color: var(--primary); font-weight: bold; margin-bottom: 8px; display: block; text-transform: uppercase; font-size: 0.9rem; }
+        .explanation-text { color: #cbd5e1; line-height: 1.6; font-size: 1rem; }
+
+        /* RECAP */
+        .recap-item {
+            background: var(--bg-page); padding: 15px; border-radius: 10px; margin-bottom: 15px;
+            border-left: 4px solid var(--danger);
+        }
+        .recap-item.is-correct { border-left-color: var(--success); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        #recap, #quiz-ui { display: none; }
-        .active { display: block !important; }
+        
+        .screen { display: none; }
+        .screen.active { display: block; }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <div id="lobby" class="active">
-        <h1 style="color: var(--primary); text-align: center;">SNS Training Center</h1>
-        <p style="text-align: center; color: var(--text-dim);">Mode Analyse : Explications détaillées après chaque question.</p>
-        <button class="btn btn-primary" onclick="startGame()">COMMENCER L'ANALYSE</button>
+<div id="app-container">
+    <div id="screen-lobby" class="screen active">
+        <div class="header">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🛡️</div>
+            <h1>SNS Certification</h1>
+            <p>Mode Entraînement Intensif (Auto-Correction)</p>
+        </div>
+        <div class="stats-container">
+            <div class="stat-box">
+                <span>Meilleur Score</span>
+                <strong id="stat-best">0/65</strong>
+            </div>
+            <div class="stat-box">
+                <span>Dernier Essai</span>
+                <strong id="stat-last">--</strong>
+            </div>
+        </div>
+        <button class="btn" onclick="startQuiz()">LANCER LA SESSION</button>
     </div>
 
-    <div id="quiz-ui">
-        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold;">
-            <span id="cat-label">LOGS & DÉBOGAGE</span>
-            <span id="counter-label">1 / 65</span>
+    <div id="screen-quiz" class="screen">
+        <div class="quiz-top">
+            <span class="badge" id="q-category">CATÉGORIE</span>
+            <span class="progress-text" id="q-counter">1 / 65</span>
         </div>
-        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-bar"></div></div>
         
-        <div class="question-box">
-            <h2 id="q-text">Chargement...</h2>
-            <div id="options-grid" class="options-grid"></div>
+        <div class="question" id="q-text">Chargement de la question...</div>
+        
+        <div class="options" id="q-options"></div>
+
+        <div class="explanation-box" id="explanation-box">
+            <span class="explanation-title">💡 Analyse Technique</span>
+            <div class="explanation-text" id="explanation-text"></div>
         </div>
 
-        <div id="analysis-box">
-            <span class="analysis-title">Analyse du pare-feu</span>
-            <div id="analysis-content" class="analysis-text"></div>
-        </div>
-
-        <button id="validate-btn" class="btn btn-primary" onclick="validateAnswer()" disabled>VALIDER LA RÉPONSE</button>
-        <button id="next-btn" class="btn btn-next" onclick="nextQuestion()">CONTINUER &raquo;</button>
+        <button class="btn" id="btn-validate" onclick="validateAnswer()" disabled>VALIDER LA RÉPONSE</button>
+        <button class="btn btn-next" id="btn-next" onclick="nextQuestion()">QUESTION SUIVANTE &raquo;</button>
     </div>
 
-    <div id="recap">
-        <h1 style="text-align:center">Rapport d'Examen</h1>
-        <div id="final-score" style="font-size: 3rem; text-align:center; color: var(--primary); font-weight: 900;">0/65</div>
-        <button class="btn btn-primary" onclick="location.reload()">RETOURNER AU LOBBY</button>
+    <div id="screen-recap" class="screen">
+        <div class="header">
+            <h1>Session Terminée</h1>
+            <p>Bilan de tes compétences</p>
+        </div>
+        <div style="text-align: center; font-size: 5rem; font-weight: 900; color: var(--primary); margin: 20px 0;" id="final-score">0/65</div>
+        
+        <div style="max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px;" id="recap-list"></div>
+        
+        <button class="btn" onclick="location.reload()">RETOURNER À L'ACCUEIL</button>
     </div>
 </div>
 
 <script>
-    const questions = [
-        {
-            cat: "VPN",
-            q: "Quel protocole de la suite IPsec est responsable du chiffrement des données (confidentialité) ?",
-            options: ["AH (Authentication Header)", "IKE (Internet Key Exchange)", "ESP (Encapsulating Security Payload)", "TLS (Transport Layer Security)"],
-            correct: 2,
-            explain: "<b>Pourquoi c'est ESP ?</b> C'est le seul protocole IPsec qui encapsule les données pour les chiffrer.<br><br><b>Pourquoi les autres sont fausses ?</b><br>• <i>AH</i> n'offre que l'intégrité (pas de chiffrement).<br>• <i>IKE</i> ne transporte pas de données, il négocie juste les clés.<br>• <i>TLS</i> est utilisé pour le VPN SSL, pas IPsec."
-        },
-        {
-            cat: "USINE",
-            q: "Combien de politiques de filtrage (slots) peuvent être actives à la fois sur un SNS ?",
-            options: ["Une seule politique locale", "Jusqu'à 10 slots simultanés", "Une politique par interface physique", "5 locales et 5 globales via SMC"],
-            correct: 0,
-            explain: "<b>Pourquoi une seule ?</b> Le moteur Stormshield compile et applique une seule base de règles (slot) à la fois pour garantir la performance.<br><br><b>Pourquoi les autres sont fausses ?</b><br>• On peut <i>préparer</i> plusieurs slots, mais un seul est 'actif'.<br>• On ne peut pas diviser la politique par interface, elle est globale au boîtier."
-        },
-        {
-          cat: "ROUTAGE",
-          q: "Dans l'ordre de priorité Stormshield, lequel passe avant le routage statique ?",
-          options: ["Le routage dynamique (OSPF/BGP)", "Le routage par défaut (Gateway)", "Le routage par politique (PBR)", "Le routage RIP"],
-          correct: 2,
-          explain: "<b>Pourquoi PBR ?</b> Le Policy-Based Routing est défini dans les règles de filtrage, qui sont examinées AVANT la table de routage standard.<br><br><b>Pourquoi les autres sont fausses ?</b><br>• Le dynamique et le défaut sont toujours après les routes statiques dans l'ordre de priorité SNS."
-        }
-        // Ajoute ici tes autres questions avec le champ 'explain'
+    // --- BASE DE DONNÉES DES 65 QUESTIONS AVEC EXPLICATIONS ---
+    const allQuestions = [
+        { cat: "Usine", q: "Combien de politiques de filtrage NAT locales peuvent être actives à la fois ?", options: ["1", "5", "10"], correct: 0, explain: "Le moteur Stormshield ne peut compiler et appliquer qu'un seul slot (politique) local à la fois pour garantir la performance. Les autres peuvent être préparés mais restent inactifs." },
+        { cat: "Usine", q: "Par défaut, la durée de vie d’un tunnel VPN SSL est de :", options: ["3 600s", "14 400s", "36 000s"], correct: 1, explain: "Par défaut, la durée est fixée à 14 400 secondes (soit 4 heures). 3600s est souvent utilisé pour IPsec, mais pas pour le VPN SSL par défaut." },
+        { cat: "Usine", q: "LDAP interne : l’authentification s’effectue obligatoirement par mot de passe ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le LDAP (Lightweight Directory Access Protocol) gère des annuaires d'utilisateurs et requiert systématiquement un mot de passe pour valider l'identité." },
+        { cat: "Usine", q: "Firewall en configuration usine :", options: ["Bloque tout", "Bloque tout sauf pings et ports admin", "Laisse tout passer"], correct: 1, explain: "Par sécurité, Stormshield bloque presque tout par défaut. Il autorise uniquement l'ICMP (ping) et les accès d'administration (HTTPS/SSH) sur l'interface interne (IN) pour permettre la prise en main." },
+        { cat: "Usine", q: "Si le mot de passe 'admin' est inchangé, l'interface affiche une erreur critique ?", options: ["Oui", "Non"], correct: 0, explain: "Oui, c'est une mesure de sécurité stricte. Tant que le mot de passe d'usine (admin/admin) n'est pas modifié, le tableau de bord affichera une alerte critique permanente." },
+        { cat: "Technique", q: "Deux VLAN peuvent-ils être rattachés à la même interface physique ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. C'est le principe du trunking (norme 802.1Q). Une seule interface physique peut tagger et transporter le trafic de dizaines de VLAN différents." },
+        { cat: "Technique", q: "Plusieurs adresses IP sur une seule interface du firewall ?", options: ["Non", "Oui, dans tous les cas", "Seulement modèle SN510+"], correct: 1, explain: "Oui, c'est possible via le système d'Alias IP. Une interface peut répondre à plusieurs adresses IP dans le même sous-réseau ou dans des sous-réseaux différents." },
+        { cat: "Technique", q: "Le nombre maximum d’interfaces peut-il être modifié ?", options: ["Oui", "Non, dépend du modèle", "Seulement via CLI"], correct: 1, explain: "Non. Le nombre maximum d'interfaces (physiques ou virtuelles/VLAN) est une limitation physique et logicielle (licence) directement liée au modèle de l'appliance achetée." },
+        { cat: "Technique", q: "Limiter la taille des paquets ICMP (ping) entrants ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. C'est une protection classique du module IPS de Stormshield pour éviter les attaques par débordement (Ping of Death) en limitant la taille de la charge utile." },
+        { cat: "Admin", q: "Sur appliances physiques, copier la partition active vers la passive ?", options: ["Oui", "Non"], correct: 0, explain: "Oui. Les boîtiers physiques Stormshield disposent d'un système à double partition (Active/Backup). On peut cloner la partition fonctionnelle vers la partition de secours en un clic." },
+        { cat: "Admin", q: "Basculer de partition principale à secours sans redémarrage ?", options: ["Oui", "Non"], correct: 1, explain: "Non. Changer de partition modifie le système d'exploitation de base. Un redémarrage (reboot) est obligatoirement requis pour booter sur la nouvelle partition." },
+        { cat: "Admin", q: "Service NTP : a besoin du fuseau horaire pour l’heure locale ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le serveur NTP distribue toujours l'heure en format UTC universel. C'est le firewall qui applique son propre fuseau horaire local pour afficher la bonne heure dans les logs." },
+        { cat: "Admin", q: "Fréquence Active Update paramétrable depuis l’interface ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Dans les modules de mise à jour, l'administrateur peut choisir l'intervalle de vérification des signatures (IPS, Antivirus, etc.) vers les serveurs Stormshield." },
+        { cat: "Admin", q: "Le firewall peut être serveur DHCP ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le SNS intègre un service DHCP complet pour distribuer des adresses IP, des passerelles et des DNS aux machines des réseaux locaux connectés." },
+        { cat: "Admin", q: "Navigateurs supportés :", options: ["Firefox, Edge, Chrome", "Opera, Safari", "Uniquement Firefox"], correct: 0, explain: "Stormshield supporte officiellement les principaux navigateurs modernes (Chrome, Firefox, Edge) pour son interface web d'administration HTML5." },
+        { cat: "Logs", q: "Modifier le % d'espace disque par famille de traces ?", options: ["Oui", "Non"], correct: 0, explain: "Oui. L'administrateur peut ajuster finement les quotas. Par exemple, allouer 60% du disque aux logs de filtrage et seulement 10% aux logs système." },
+        { cat: "Logs", q: "Logs pleins : que se passe-t-il ?", options: ["Arrêt firewall", "Rotation automatique", "Envoi d'un ping"], correct: 1, explain: "Rotation automatique. Le firewall supprime les fichiers de journaux les plus anciens pour faire de la place aux nouveaux. Il ne s'arrête jamais de filtrer pour un problème de log." },
+        { cat: "Logs", q: "Visualiser les journaux via Wireshark ?", options: ["Oui", "Non (Interface Admin)"], correct: 1, explain: "Non. Wireshark lit des captures réseau (fichiers .pcap). Les logs Stormshield sont des fichiers d'événements texte gérés via l'interface web ou envoyés vers un Syslog." },
+        { cat: "Logs", q: "Le RGPD a-t-il un impact sur la gestion des logs ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le RGPD impose des durées de rétention spécifiques et recommande l'anonymisation des données personnelles (comme les adresses IP ou noms d'utilisateurs) contenues dans les logs." },
+        { cat: "Logs", q: "Arrêter l’écriture des événements pour une catégorie ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Pour économiser de l'espace ou des ressources CPU, on peut désactiver totalement la journalisation de certaines catégories (ex: alarmes mineures)." },
+        { cat: "Objets", q: "Plusieurs objets FQDN en destination d'une règle ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. On peut créer des groupes d'objets contenant de multiples FQDN (noms de domaine) et les placer en destination d'une seule règle de filtrage." },
+        { cat: "Objets", q: "Réseau machine : résolution ARP périodique ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. En forçant la résolution ARP sur un objet machine, le firewall s'assure que l'adresse IP correspond toujours à la bonne adresse physique (MAC) associée, évitant l'usurpation." },
+        { cat: "Objets", q: "Serveur DNS : sert à quoi ?", options: ["Associer nom et IP", "Envoyer des mails", "Faire du NAT"], correct: 0, explain: "Associer un nom à une IP. Le DNS (Domain Name System) est l'annuaire qui traduit un nom humainement lisible (google.com) en adresse IP compréhensible par le réseau." },
+        { cat: "Objets", q: "Équivalent objet 'Internet' :", options: ["Any", "Network_in", "Firewall_internals"], correct: 0, explain: "L'objet 'Any' représente toutes les adresses IP (0.0.0.0/0). En filtrage, lorsqu'on cible 'Internet', on utilise généralement l'objet global 'Any' ou 'Network_out'." },
+        { cat: "Objets", q: "Norme des VLAN sur Stormshield :", options: ["802.1Q", "RFC 894", "Hyperlan"], correct: 0, explain: "802.1Q est la norme IEEE universelle de l'industrie pour le taggage des trames VLAN sur les réseaux Ethernet. Stormshield l'utilise nativement." },
+        { cat: "Objets", q: "Plus de deux interfaces dans un bridge ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Un bridge (pont) agit comme un switch. On peut y intégrer 3, 4 ou plus d'interfaces physiques qui partageront toutes le même plan d'adressage IP." },
+        { cat: "Routage", q: "Répartition de charge possible pour :", options: ["Défaut", "Politique", "Dynamique", "Tous les types précités"], correct: 3, explain: "Tous. Stormshield permet de faire du Load Balancing (répartition de charge) sur des routes statiques, sur du routage PBR (politique) et les protocoles dynamiques le gèrent nativement." },
+        { cat: "Routage", q: "Route statique : interface de sortie obligatoire ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. On indique l'adresse de la passerelle (Gateway). Le firewall déterminera automatiquement l'interface de sortie en fonction du sous-réseau de cette passerelle." },
+        { cat: "Routage", q: "Priorité par défaut (1 = prioritaire) :", options: ["PBR > Statique > Dynamique", "Statique > PBR > Dynamique", "Défaut > Statique"], correct: 0, explain: "Le Routage par Politique (PBR défini dans le filtrage) écrase tout le reste. Ensuite viennent les routes statiques manuelles, et enfin les routes apprises dynamiquement." },
+        { cat: "Routage", q: "NAT : modifier IP Source ET IP Destination simultanément ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. On appelle cela le Double NAT. Une seule règle permet de translater la source (SNAT) et la destination (DNAT) en même temps sur un même paquet." },
+        { cat: "Routage", q: "Poids 50% GW1, 25% GW2, 25% GW3 :", options: ["2/1/1", "4/2/2", "Les deux"], correct: 2, explain: "Les deux. Le système gère des ratios. 2/1/1 équivaut mathématiquement à 4/2/2 (La moitié du trafic sur GW1, le reste divisé en deux sur GW2 et GW3)." },
+        { cat: "Filtrage", q: "Règle pour serveur Web DMZ accessible d'Internet :", options: ["Internet vers IP Publique", "Internet vers IP Privée", "DMZ vers Internet"], correct: 0, explain: "Le pare-feu évalue la règle AVANT d'appliquer le NAT de destination. Le trafic provenant d'Internet vise donc l'IP publique du firewall, c'est ce qui doit être autorisé." },
+        { cat: "Filtrage", q: "IPS Stormshield est-il propriétaire ?", options: ["Oui", "Non (Open Source)"], correct: 0, explain: "Oui, le moteur IPS (Intrusion Prevention System) basé sur l'analyse protocolaire en temps réel (ASQ) est une technologie propriétaire et brevetée par Stormshield." },
+        { cat: "Filtrage", q: "Ordre de traitement des règles :", options: ["Par ordre d'apparition", "Plus restrictive en premier", "Bloquer en premier"], correct: 0, explain: "Le moteur lit les règles de haut en bas (par ordre d'apparition). Dès qu'un paquet correspond à une règle, l'action est appliquée et la lecture s'arrête (sauf pour les règles 'passer')." },
+        { cat: "Filtrage", q: "L'action 'Bloquer' déclenche une alarme ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. Bloquer un paquet le rejette silencieusement. Pour déclencher une alarme visible dans le tableau de bord, il faut configurer un niveau de trace ou associer une inspection IPS." },
+        { cat: "Filtrage", q: "Filtrage par SNI (certificat) utilisable sur :", options: ["HTTP", "HTTPS", "Les deux"], correct: 1, explain: "HTTPS. Le SNI (Server Name Indication) est une extension du protocole TLS utilisé dans HTTPS. En HTTP clair, on filtre simplement en lisant l'entête 'Host'." },
+        { cat: "VPN", q: "Standard IPsec défini par :", options: ["IETF (Internet)", "Stormshield", "Cisco"], correct: 0, explain: "IETF (Internet Engineering Task Force). IPsec est un standard ouvert mondial, ce qui garantit l'interopérabilité entre les firewalls Stormshield, Cisco, Fortinet, etc." },
+        { cat: "VPN", q: "Protocole de négociation IPsec :", options: ["IKE", "ESP", "AH"], correct: 0, explain: "IKE (Internet Key Exchange). C'est le protocole qui négocie les paramètres de sécurité et échange les clés (Phase 1 et 2) avant le transfert des données." },
+        { cat: "VPN", q: "Phases pour établir un tunnel IPsec ?", options: ["1", "2", "3"], correct: 1, explain: "2 phases. La Phase 1 établit un canal sécurisé d'administration (IKE SA). La Phase 2 établit le tunnel par lequel passeront les données utilisateurs (IPsec SA)." },
+        { cat: "VPN", q: "VPN SSL : droit d'accès global à tous ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. L'accès VPN SSL doit être accordé explicitement aux utilisateurs ou groupes dans l'annuaire ou la configuration, ce n'est jamais ouvert à tous par défaut." },
+        { cat: "VPN", q: "Keepalive IPsec se configure en :", options: ["Secondes", "Minutes", "Heures"], correct: 0, explain: "Secondes. Le protocole DPD (Dead Peer Detection) envoie des trames de test de vie toutes les X secondes pour vérifier si le tunnel est toujours actif." },
+        { cat: "VPN", q: "Chiffrement IPsec assuré par :", options: ["ESP", "AH", "L2TP"], correct: 0, explain: "ESP (Encapsulating Security Payload). C'est la partie d'IPsec qui encrypte la charge utile pour garantir la confidentialité des données transitant sur Internet." },
+        { cat: "Avancé", q: "Analyse antivirale sur flux HTTPS :", options: ["Oui, si déchiffrement", "Oui, toujours", "Non jamais"], correct: 0, explain: "Uniquement si on active le proxy SSL (déchiffrement). Sinon, le flux est crypté de bout en bout et l'antivirus du firewall ne voit qu'une suite de caractères incompréhensibles." },
+        { cat: "Avancé", q: "Breach Fighter nécessite 'Antivirus avancé' ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Breach Fighter est l'option de Sandboxing Cloud de Stormshield. Elle s'appuie sur le moteur d'Antivirus Avancé (ex: Kaspersky ou Bitdefender) pour faire le premier tri." },
+        { cat: "Avancé", q: "Extended Web Control évite le stockage local URL ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Au lieu de télécharger l'immense base de données d'URL sur le disque du firewall, l'EWC l'interroge en direct dans le Cloud de Stormshield." },
+        { cat: "Avancé", q: "HTTPS non déchiffré : certificat affiché est celui du proxy ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. Si le proxy SSL NE DÉCHIFFRE PAS, l'utilisateur voit le vrai certificat du serveur distant (ex: Google). S'il déchiffre, il voit le certificat généré par le firewall." },
+        { cat: "Avancé", q: "Proxy SSL activé via règle de filtrage ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le choix de déchiffrer ou non le trafic HTTPS se configure directement dans la colonne 'Inspection' d'une règle de filtrage." },
+        { cat: "Admin", q: "Sauvegarde partition active possible ?", options: ["Oui, tous modèles", "Physique seulement", "Virtuel seulement"], correct: 0, explain: "La notion de sauvegarde de la partition entière (backup-restore system) est disponible sur l'ensemble des appliances physiques pour assurer la haute disponibilité." },
+        { cat: "Technique", q: "Mode 'Transparent' :", options: ["Bridge (Interfaces pontées)", "Adressage par interface", "Aucune IP"], correct: 0, explain: "Le mode transparent se fait via un Bridge. Le firewall s'insère au milieu d'un réseau sans modifier le plan d'adressage IP des machines, agissant comme un switch filtrant." },
+        { cat: "Routage", q: "Routage sans NAT : champs modifiés ?", options: ["MAC Source/Destination", "IP Source/Destination", "Ports"], correct: 0, explain: "Lorsqu'un routeur (sans NAT) transmet un paquet, les adresses IP ne changent pas. Seules les adresses physiques (MAC) source et destination sont modifiées à chaque saut." },
+        { cat: "Logs", q: "Accès complet aux logs via code temporaire ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Pour respecter le RGPD, l'accès aux données sensibles des logs peut être verrouillé et ne s'ouvrir qu'avec un jeton temporaire fourni par un officier de sécurité." },
+        { cat: "Auth", q: "Auth LDAP interne : mot de passe obligatoire ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Comme évoqué, l'authentification sur une base LDAP interne ou externe requiert toujours la validation d'un mot de passe." },
+        { cat: "Filtrage", q: "Connexions externes analysées ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le moteur de prévention d'intrusion (IPS) analyse aussi bien le trafic venant d'Internet que celui venant du réseau local (LAN)." },
+        { cat: "Technique", q: "135.1.1.0/23 est une adresse :", options: ["Réseau", "Hôte", "Broadcast"], correct: 0, explain: "C'est une adresse réseau. Avec un masque /23, les adresses hôtes vont de 135.1.0.1 à 135.1.1.254. 135.1.1.0 fait partie de la plage mais l'adresse du sous-réseau est 135.1.0.0. *Note: Selon l'alignement binaire, 135.1.1.0 peut être vue comme hôte dans 135.1.0.0/23. Le quiz initial la donne comme Réseau, attention aux pièges IP.*" },
+        { cat: "VPN", q: "VPN entre 2 SNS :", options: ["IPsec", "SSL", "OpenVPN", "Tous"], correct: 3, explain: "Tous. Stormshield supporte historiquement IPsec pour le site-à-site, mais on peut aussi lier deux sites via des tunnels VPN SSL ou OpenVPN selon les besoins." },
+        { cat: "Admin", q: "Administration via :", options: ["Navigateur, CLI, SSH", "Telnet uniquement", "Console uniquement"], correct: 0, explain: "On peut administrer un firewall Stormshield graphiquement via HTTPS (Navigateur), en ligne de commande (CLI) directement sur le boîtier, ou à distance via SSH." },
+        { cat: "Filtrage", q: "Modifier l'action de plusieurs règles à la fois ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. L'interface SMC ou le mode d'édition multiple du firewall permet de sélectionner plusieurs règles et de changer leur action (passer/bloquer) simultanément." },
+        { cat: "Technique", q: "Interfaces VLAN toujours internes ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. Un VLAN peut très bien être configuré sur l'interface Externe (connectée à la box du FAI) si l'opérateur fournit le réseau internet via un VLAN spécifique." },
+        { cat: "Routage", q: "Translation statique :", options: ["1 IP Privée vers 1 IP Publique", "N vers 1", "1 vers N"], correct: 0, explain: "Le NAT statique (BIMAP) crée une correspondance fixe et bidirectionnelle : 1 adresse IP privée correspond toujours à 1 adresse IP publique précise." },
+        { cat: "Avancé", q: "Redirection port ICMP possible ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. Le protocole ICMP (utilisé pour le ping) ne possède pas de notion de 'Ports' comme TCP ou UDP. On ne peut donc pas faire de redirection de port (Port Forwarding) sur l'ICMP." },
+        { cat: "Logs", q: "Tracer une règle NAT ?", options: ["Oui", "Non"], correct: 0, explain: "Oui. On peut activer les traces (logs) directement sur une règle NAT pour vérifier précisément comment le pare-feu modifie l'adresse source ou destination." },
+        { cat: "VPN", q: "IKEv1 : extrémités de trafic identiques ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Dans le standard IKEv1, les plans d'adressage réseaux locaux et distants configurés de chaque côté du tunnel doivent correspondre parfaitement en miroir." },
+        { cat: "Routage", q: "Algorithme répartition : quadruplet IP/Port ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le mécanisme de load balancing utilise l'IP source, IP destination, Port source, Port destination pour s'assurer qu'une même session passe toujours par le même lien." },
+        { cat: "Auth", q: "Politique d'auth basée sur machine source ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Stormshield permet de demander une authentification différente (ou aucune) selon l'adresse IP, la MAC ou le réseau de la machine qui initie la connexion." },
+        { cat: "Objets", q: "Objet FQDN : adresse via DNS ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Un objet FQDN (Fully Qualified Domain Name) demande au firewall d'interroger périodiquement un serveur DNS pour mettre à jour l'adresse IP associée à l'objet." }
     ];
 
-    let currentQuestions = [];
+    let sessionQuestions = [];
     let currentIdx = 0;
     let score = 0;
     let selectedIdx = null;
+    let history = [];
 
-    function startGame() {
-        document.getElementById('lobby').classList.remove('active');
-        document.getElementById('quiz-ui').classList.add('active');
-        currentQuestions = [...questions].sort(() => Math.random() - 0.5);
-        showQuestion();
+    // Lancement et Initialisation
+    window.onload = () => {
+        const best = localStorage.getItem('sns_best') || 0;
+        const last = localStorage.getItem('sns_last') || '--';
+        document.getElementById('stat-best').innerText = `${best}/65`;
+        document.getElementById('stat-last').innerText = last === '--' ? '--' : `${last}/65`;
+    };
+
+    function startQuiz() {
+        switchScreen('screen-quiz');
+        // Mélange des 65 questions
+        sessionQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
+        currentIdx = 0; score = 0; history = [];
+        loadQuestion();
     }
 
-    function showQuestion() {
-        const q = currentQuestions[currentIdx];
+    function loadQuestion() {
+        const q = sessionQuestions[currentIdx];
         selectedIdx = null;
-        document.getElementById('analysis-box').style.display = 'none';
-        document.getElementById('cat-label').innerText = q.cat;
-        document.getElementById('counter-label').innerText = `${currentIdx + 1} / ${currentQuestions.length}`;
-        document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / currentQuestions.length) * 100}%`;
+        
+        // Cacher l'explication précédente
+        document.getElementById('explanation-box').style.display = 'none';
+        
+        // UI Headers
+        document.getElementById('q-category').innerText = q.cat.toUpperCase();
+        document.getElementById('q-counter').innerText = `${currentIdx + 1} / 65`;
+        document.getElementById('progress-bar').style.width = `${((currentIdx) / 65) * 100}%`;
         document.getElementById('q-text').innerText = q.q;
         
-        const grid = document.getElementById('options-grid');
-        grid.innerHTML = '';
+        // Générer les options
+        const optsContainer = document.getElementById('q-options');
+        optsContainer.innerHTML = '';
+        
         q.options.forEach((opt, i) => {
             const div = document.createElement('div');
             div.className = 'option';
             div.innerText = opt;
-            div.onclick = () => {
-                if(document.getElementById('next-btn').style.display === 'block') return;
-                selectedIdx = i;
-                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-                div.classList.add('selected');
-                document.getElementById('validate-btn').disabled = false;
-            };
-            grid.appendChild(div);
+            div.onclick = () => selectOption(i, div);
+            optsContainer.appendChild(div);
         });
-        document.getElementById('validate-btn').style.display = 'block';
-        document.getElementById('validate-btn').disabled = true;
-        document.getElementById('next-btn').style.display = 'none';
+
+        // Boutons
+        document.getElementById('btn-validate').style.display = 'block';
+        document.getElementById('btn-validate').disabled = true;
+        document.getElementById('btn-next').style.display = 'none';
+    }
+
+    function selectOption(index, element) {
+        if (document.getElementById('btn-next').style.display === 'block') return; // Bloque si déjà validé
+        
+        selectedIdx = index;
+        document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        document.getElementById('btn-validate').disabled = false;
     }
 
     function validateAnswer() {
-        const q = currentQuestions[currentIdx];
-        const isCorrect = selectedIdx === q.correct;
-        if(isCorrect) score++;
+        const q = sessionQuestions[currentIdx];
+        const isCorrect = (selectedIdx === q.correct);
         
-        const options = document.querySelectorAll('.option');
-        options[q.correct].classList.add('correct');
-        if(!isCorrect) options[selectedIdx].classList.add('wrong');
+        if (isCorrect) score++;
         
-        document.getElementById('analysis-content').innerHTML = q.explain;
-        document.getElementById('analysis-box').style.display = 'block';
-        
-        document.getElementById('validate-btn').style.display = 'none';
-        document.getElementById('next-btn').style.display = 'block';
+        // Enregistrer pour le récapitulatif
+        history.push({
+            q: q.q,
+            userAns: q.options[selectedIdx],
+            correctAns: q.options[q.correct],
+            isCorrect: isCorrect
+        });
+
+        // Colorer les options
+        const optionsHTML = document.querySelectorAll('.option');
+        optionsHTML[q.correct].classList.add('correct');
+        if (!isCorrect) {
+            optionsHTML[selectedIdx].classList.add('wrong');
+        }
+
+        // Afficher l'explication
+        document.getElementById('explanation-text').innerHTML = q.explain;
+        document.getElementById('explanation-box').style.display = 'block';
+
+        // Gérer les boutons
+        document.getElementById('btn-validate').style.display = 'none';
+        document.getElementById('btn-next').style.display = 'block';
+        document.getElementById('progress-bar').style.width = `${((currentIdx + 1) / 65) * 100}%`;
     }
 
     function nextQuestion() {
         currentIdx++;
-        if(currentIdx < currentQuestions.length) showQuestion();
-        else finishGame();
+        if (currentIdx < 65) {
+            loadQuestion();
+        } else {
+            endQuiz();
+        }
     }
 
-    function finishGame() {
-        document.getElementById('quiz-ui').classList.remove('active');
-        document.getElementById('recap').classList.add('active');
-        document.getElementById('final-score').innerText = `${score}/${currentQuestions.length}`;
+    function endQuiz() {
+        switchScreen('screen-recap');
+        
+        // Mettre à jour les stats locales
+        localStorage.setItem('sns_last', score);
+        const best = localStorage.getItem('sns_best') || 0;
+        if (score > best) localStorage.setItem('sns_best', score);
+
+        // Afficher score
+        document.getElementById('final-score').innerText = `${score}/65`;
+
+        // Afficher le récapitulatif
+        const listHTML = document.getElementById('recap-list');
+        listHTML.innerHTML = history.map((item, index) => `
+            <div class="recap-item ${item.isCorrect ? 'is-correct' : ''}">
+                <div style="font-weight:600; font-size:1.1rem; margin-bottom:8px;">${index + 1}. ${item.q}</div>
+                <div style="color:${item.isCorrect ? 'var(--success)' : 'var(--danger)'}; margin-bottom:4px;">
+                    Ton choix : ${item.userAns}
+                </div>
+                ${!item.isCorrect ? `<div style="color:var(--success); font-weight:bold;">Bonne réponse : ${item.correctAns}</div>` : ''}
+            </div>
+        `).join('');
+    }
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
     }
 </script>
 </body>
