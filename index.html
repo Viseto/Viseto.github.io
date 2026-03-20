@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNS Certification Training</title>
+    <title>SNS Certification - Analyse Technique</title>
     <style>
         :root {
             --primary: #0ea5e9;
-            --primary-hover: #0284c7;
             --success: #22c55e;
             --danger: #ef4444;
             --bg: #0f172a;
@@ -16,300 +15,146 @@
             --text-dim: #94a3b8;
         }
 
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
+        #game-container { background: var(--card); width: 100%; max-width: 800px; border-radius: 1.5rem; padding: 2rem; border: 1px solid #334155; align-self: center; }
 
-        #game-container {
-            background: var(--card);
-            width: 95%;
-            max-width: 800px;
-            border-radius: 1.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid #334155;
-            padding: 2rem;
-        }
+        .progress-bar { height: 6px; background: #334155; border-radius: 10px; margin: 1rem 0 2rem; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
 
-        /* Lobby Style */
-        .hero { text-align: center; padding: 2rem 0; }
-        .hero h1 { font-size: 2.5rem; margin: 0; color: var(--primary); letter-spacing: -1px; }
-        .hero p { color: var(--text-dim); margin-top: 0.5rem; }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .stat-card {
-            background: #0f172a;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            text-align: center;
-            border: 1px solid #334155;
-        }
-
-        .stat-card span { display: block; font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
-        .stat-card b { font-size: 1.5rem; color: var(--primary); }
-
-        /* Quiz UI */
-        .quiz-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #334155;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: #334155;
-            width: 100%;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--primary);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .question-box h2 { font-size: 1.4rem; line-height: 1.5; margin-bottom: 2rem; }
-
+        .question-box h2 { font-size: 1.3rem; line-height: 1.5; margin-bottom: 1.5rem; }
         .options-grid { display: grid; gap: 0.75rem; }
 
         .option {
-            background: #334155;
-            padding: 1.25rem;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            font-size: 1.05rem;
+            background: #334155; padding: 1rem; border-radius: 0.75rem; cursor: pointer;
+            border: 2px solid transparent; transition: 0.2s; font-size: 1rem;
         }
+        .option.selected { border-color: var(--primary); }
+        .option.correct { background: var(--success) !important; color: white; border-color: #16a34a; }
+        .option.wrong { background: var(--danger) !important; color: white; border-color: #dc2626; }
 
-        .option:hover { background: #475569; }
-        .option.selected { border-color: var(--primary); background: #1e293b; }
-        .option.correct { background: var(--success) !important; border-color: var(--success); }
-        .option.wrong { background: var(--danger) !important; border-color: var(--danger); }
+        /* ZONE EXPLICATION */
+        #analysis-box {
+            display: none; background: #0f172a; border-radius: 1rem; padding: 1.5rem;
+            margin-top: 1.5rem; border: 1px solid var(--primary); animation: fadeIn 0.4s;
+        }
+        .analysis-title { font-weight: 800; color: var(--primary); text-transform: uppercase; font-size: 0.8rem; margin-bottom: 0.5rem; display: block; }
+        .analysis-text { font-size: 0.95rem; line-height: 1.6; color: #cbd5e1; }
 
-        /* Buttons */
         .btn {
-            width: 100%;
-            padding: 1.25rem;
-            border-radius: 0.75rem;
-            border: none;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 1.5rem;
+            width: 100%; padding: 1rem; border-radius: 0.75rem; border: none;
+            font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 1.5rem;
         }
-
         .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-next { background: #334155; color: white; display: none; }
 
-        .btn-next { background: var(--success); color: white; display: none; }
-
-        /* Recap */
-        .recap-item {
-            background: #0f172a;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid var(--danger);
-        }
-        .recap-item.is-correct { border-left-color: var(--success); }
-
-        #lobby, #quiz-ui, #recap { display: none; }
-        #lobby.active, #quiz-ui.active, #recap.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #recap, #quiz-ui { display: none; }
+        .active { display: block !important; }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <div id="lobby" class="active">
-        <div class="hero">
-            <h1>SNS Certification</h1>
-            <p>Préparation intensive Stormshield (65 questions)</p>
-        </div>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span>Meilleur Score</span>
-                <b id="best-score-display">0/65</b>
-            </div>
-            <div class="stat-card">
-                <span>Dernière Tentative</span>
-                <b id="last-score-display">--</b>
-            </div>
-        </div>
-        <button class="btn btn-primary" onclick="startGame()">DÉMARRER LE TEST</button>
+        <h1 style="color: var(--primary); text-align: center;">SNS Training Center</h1>
+        <p style="text-align: center; color: var(--text-dim);">Mode Analyse : Explications détaillées après chaque question.</p>
+        <button class="btn btn-primary" onclick="startGame()">COMMENCER L'ANALYSE</button>
     </div>
 
     <div id="quiz-ui">
-        <div class="quiz-header">
-            <span id="cat-label" style="color: var(--primary); font-weight: 800; font-size: 0.9rem;">CATÉGORIE</span>
-            <span id="counter-label" style="font-weight: bold;">1 / 65</span>
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold;">
+            <span id="cat-label">LOGS & DÉBOGAGE</span>
+            <span id="counter-label">1 / 65</span>
         </div>
-        <div class="progress-bar">
-            <div id="progress-fill" class="progress-fill"></div>
-        </div>
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        
         <div class="question-box">
-            <h2 id="q-text">Chargement de la question...</h2>
+            <h2 id="q-text">Chargement...</h2>
             <div id="options-grid" class="options-grid"></div>
         </div>
+
+        <div id="analysis-box">
+            <span class="analysis-title">Analyse du pare-feu</span>
+            <div id="analysis-content" class="analysis-text"></div>
+        </div>
+
         <button id="validate-btn" class="btn btn-primary" onclick="validateAnswer()" disabled>VALIDER LA RÉPONSE</button>
-        <button id="next-btn" class="btn btn-next" onclick="nextQuestion()">QUESTION SUIVANTE &raquo;</button>
+        <button id="next-btn" class="btn btn-next" onclick="nextQuestion()">CONTINUER &raquo;</button>
     </div>
 
     <div id="recap">
-        <div class="hero">
-            <h1 id="final-result-title">Test terminé</h1>
-            <div id="final-score" style="font-size: 4rem; font-weight: 900; margin: 1rem 0;">0/65</div>
-        </div>
-        <div id="recap-list" style="max-height: 300px; overflow-y: auto; padding-right: 10px;"></div>
-        <button class="btn btn-primary" onclick="location.reload()">RETOUR AU MENU</button>
+        <h1 style="text-align:center">Rapport d'Examen</h1>
+        <div id="final-score" style="font-size: 3rem; text-align:center; color: var(--primary); font-weight: 900;">0/65</div>
+        <button class="btn btn-primary" onclick="location.reload()">RETOURNER AU LOBBY</button>
     </div>
 </div>
 
 <script>
-    const allQuestions = [
-        { cat: "Usine", q: "Combien de politiques de filtrage NAT locales peuvent être actives à la fois ?", options: ["1", "5", "10"], correct: 0 },
-        { cat: "Usine", q: "Par défaut, la durée de vie d’un tunnel VPN SSL est de :", options: ["3 600s", "14 400s", "36 000s"], correct: 1 },
-        { cat: "Usine", q: "LDAP interne : l’authentification s’effectue obligatoirement par mot de passe ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Usine", q: "Firewall en configuration usine :", options: ["Bloque tout", "Bloque tout sauf pings et ports admin", "Laisse tout passer"], correct: 1 },
-        { cat: "Usine", q: "Si le mot de passe 'admin' est inchangé, l'interface affiche une erreur critique ?", options: ["Oui", "Non"], correct: 0 },
-        { cat: "Technique", q: "Deux VLAN peuvent-ils être rattachés à la même interface physique ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Technique", q: "Plusieurs adresses IP sur une seule interface du firewall ?", options: ["Non", "Oui, dans tous les cas", "Seulement modèle SN510+"], correct: 1 },
-        { cat: "Technique", q: "Le nombre maximum d’interfaces peut-il être modifié ?", options: ["Oui", "Non, dépend du modèle", "Seulement via CLI"], correct: 1 },
-        { cat: "Technique", q: "Limiter la taille des paquets ICMP (ping) entrants ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Admin", q: "Sur appliances physiques, copier la partition active vers la passive ?", options: ["Oui", "Non"], correct: 0 },
-        { cat: "Admin", q: "Basculer de partition principale à secours sans redémarrage ?", options: ["Oui", "Non"], correct: 1 },
-        { cat: "Admin", q: "Service NTP : a besoin du fuseau horaire pour l’heure locale ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Admin", q: "Fréquence Active Update paramétrable depuis l’interface ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Admin", q: "Le firewall peut être serveur DHCP ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Admin", q: "Navigateurs supportés :", options: ["Firefox, Edge, Chrome", "Opera, Safari", "Uniquement Firefox"], correct: 0 },
-        { cat: "Logs", q: "Modifier le % d'espace disque par famille de traces ?", options: ["Oui", "Non"], correct: 0 },
-        { cat: "Logs", q: "Logs pleins : que se passe-t-il ?", options: ["Arrêt firewall", "Rotation automatique", "Envoi d'un ping"], correct: 1 },
-        { cat: "Logs", q: "Visualiser les journaux via Wireshark ?", options: ["Oui", "Non (Interface Admin)"], correct: 1 },
-        { cat: "Logs", q: "Le RGPD a-t-il un impact sur la gestion des logs ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Logs", q: "Arrêter l’écriture des événements pour une catégorie ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Objets", q: "Plusieurs objets FQDN en destination d'une règle ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Objets", q: "Réseau machine : résolution ARP périodique ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Objets", q: "Serveur DNS : sert à quoi ?", options: ["Associer nom et IP", "Envoyer des mails", "Faire du NAT"], correct: 0 },
-        { cat: "Objets", q: "Équivalent objet 'Internet' :", options: ["Any", "Network_in", "Firewall_internals"], correct: 0 },
-        { cat: "Objets", q: "Norme des VLAN sur Stormshield :", options: ["802.1Q", "RFC 894", "Hyperlan"], correct: 0 },
-        { cat: "Objets", q: "Plus de deux interfaces dans un bridge ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Routage", q: "Répartition de charge possible pour :", options: ["Défaut", "Politique", "Dynamique", "Tous les types précités"], correct: 3 },
-        { cat: "Routage", q: "Route statique : interface de sortie obligatoire ?", options: ["Vrai", "Faux"], correct: 1 },
-        { cat: "Routage", q: "Priorité par défaut (1 = prioritaire) :", options: ["PBR > Statique > Dynamique", "Statique > PBR > Dynamique", "Défaut > Statique"], correct: 0 },
-        { cat: "Routage", q: "NAT : modifier IP Source ET IP Destination simultanément ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Routage", q: "Poids 50% GW1, 25% GW2, 25% GW3 :", options: ["2/1/1", "4/2/2", "Les deux"], correct: 2 },
-        { cat: "Filtrage", q: "Règle pour serveur Web DMZ accessible d'Internet :", options: ["Internet vers IP Publique", "Internet vers IP Privée", "DMZ vers Internet"], correct: 0 },
-        { cat: "Filtrage", q: "IPS Stormshield est-il propriétaire ?", options: ["Oui", "Non (Open Source)"], correct: 0 },
-        { cat: "Filtrage", q: "Ordre de traitement des règles :", options: ["Par ordre d'apparition", "Plus restrictive en premier", "Bloquer en premier"], correct: 0 },
-        { cat: "Filtrage", q: "L'action 'Bloquer' déclenche une alarme ?", options: ["Vrai", "Faux"], correct: 1 },
-        { cat: "Filtrage", q: "Filtrage par SNI (certificat) utilisable sur :", options: ["HTTP", "HTTPS", "Les deux"], correct: 1 },
-        { cat: "VPN", q: "Standard IPsec défini par :", options: ["IETF (Internet)", "Stormshield", "Cisco"], correct: 0 },
-        { cat: "VPN", q: "Protocole de négociation IPsec :", options: ["IKE", "ESP", "AH"], correct: 0 },
-        { cat: "VPN", q: "Phases pour établir un tunnel IPsec ?", options: ["1", "2", "3"], correct: 1 },
-        { cat: "VPN", q: "VPN SSL : droit d'accès global à tous ?", options: ["Vrai", "Faux"], correct: 1 },
-        { cat: "VPN", q: "Keepalive IPsec se configure en :", options: ["Secondes", "Minutes", "Heures"], correct: 0 },
-        { cat: "VPN", q: "Chiffrement IPsec assuré par :", options: ["ESP", "AH", "L2TP"], correct: 0 },
-        { cat: "Avancé", q: "Analyse antivirale sur flux HTTPS :", options: ["Oui, si déchiffrement", "Oui, toujours", "Non jamais"], correct: 0 },
-        { cat: "Avancé", q: "Breach Fighter nécessite 'Antivirus avancé' ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Avancé", q: "Extended Web Control évite le stockage local URL ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Avancé", q: "HTTPS non déchiffré : certificat affiché est celui du proxy ?", options: ["Vrai", "Faux"], correct: 1 },
-        { cat: "Avancé", q: "Proxy SSL activé via règle de filtrage ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Admin", q: "Sauvegarde partition active possible ?", options: ["Oui, tous modèles", "Physique seulement", "Virtuel seulement"], correct: 0 },
-        { cat: "Technique", q: "Mode 'Transparent' :", options: ["Bridge (Interfaces pontées)", "Adressage par interface", "Aucune IP"], correct: 0 },
-        { cat: "Routage", q: "Routage sans NAT : champs modifiés ?", options: ["MAC Source/Destination", "IP Source/Destination", "Ports"], correct: 0 },
-        { cat: "Logs", q: "Accès complet aux logs via code temporaire ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Auth", q: "Auth LDAP interne : mot de passe obligatoire ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Filtrage", q: "Connexions externes analysées ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Technique", q: "135.1.1.0/23 est une adresse :", options: ["Réseau", "Hôte", "Broadcast"], correct: 0 },
-        { cat: "VPN", q: "VPN entre 2 SNS :", options: ["IPsec", "SSL", "OpenVPN", "Tous"], correct: 3 },
-        { cat: "Admin", q: "Administration via :", options: ["Navigateur, CLI, SSH", "Telnet uniquement", "Console uniquement"], correct: 0 },
-        { cat: "Filtrage", q: "Modifier l'action de plusieurs règles à la fois ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Technique", q: "Interfaces VLAN toujours internes ?", options: ["Vrai", "Faux"], correct: 1 },
-        { cat: "Routage", q: "Translation statique :", options: ["1 IP Privée vers 1 IP Publique", "N vers 1", "1 vers N"], correct: 0 },
-        { cat: "Avancé", q: "Redirection port ICMP possible ?", options: ["Vrai", "Faux"], correct: 1 },
-        { cat: "Logs", q: "Tracer une règle NAT ?", options: ["Oui", "Non"], correct: 0 },
-        { cat: "VPN", q: "IKEv1 : extrémités de trafic identiques ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Routage", q: "Algorithme répartition : quadruplet IP/Port ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Auth", q: "Politique d'auth basée sur machine source ?", options: ["Vrai", "Faux"], correct: 0 },
-        { cat: "Objets", q: "Objet FQDN : adresse via DNS ?", options: ["Vrai", "Faux"], correct: 0 }
+    const questions = [
+        {
+            cat: "VPN",
+            q: "Quel protocole de la suite IPsec est responsable du chiffrement des données (confidentialité) ?",
+            options: ["AH (Authentication Header)", "IKE (Internet Key Exchange)", "ESP (Encapsulating Security Payload)", "TLS (Transport Layer Security)"],
+            correct: 2,
+            explain: "<b>Pourquoi c'est ESP ?</b> C'est le seul protocole IPsec qui encapsule les données pour les chiffrer.<br><br><b>Pourquoi les autres sont fausses ?</b><br>• <i>AH</i> n'offre que l'intégrité (pas de chiffrement).<br>• <i>IKE</i> ne transporte pas de données, il négocie juste les clés.<br>• <i>TLS</i> est utilisé pour le VPN SSL, pas IPsec."
+        },
+        {
+            cat: "USINE",
+            q: "Combien de politiques de filtrage (slots) peuvent être actives à la fois sur un SNS ?",
+            options: ["Une seule politique locale", "Jusqu'à 10 slots simultanés", "Une politique par interface physique", "5 locales et 5 globales via SMC"],
+            correct: 0,
+            explain: "<b>Pourquoi une seule ?</b> Le moteur Stormshield compile et applique une seule base de règles (slot) à la fois pour garantir la performance.<br><br><b>Pourquoi les autres sont fausses ?</b><br>• On peut <i>préparer</i> plusieurs slots, mais un seul est 'actif'.<br>• On ne peut pas diviser la politique par interface, elle est globale au boîtier."
+        },
+        {
+          cat: "ROUTAGE",
+          q: "Dans l'ordre de priorité Stormshield, lequel passe avant le routage statique ?",
+          options: ["Le routage dynamique (OSPF/BGP)", "Le routage par défaut (Gateway)", "Le routage par politique (PBR)", "Le routage RIP"],
+          correct: 2,
+          explain: "<b>Pourquoi PBR ?</b> Le Policy-Based Routing est défini dans les règles de filtrage, qui sont examinées AVANT la table de routage standard.<br><br><b>Pourquoi les autres sont fausses ?</b><br>• Le dynamique et le défaut sont toujours après les routes statiques dans l'ordre de priorité SNS."
+        }
+        // Ajoute ici tes autres questions avec le champ 'explain'
     ];
 
     let currentQuestions = [];
     let currentIdx = 0;
     let score = 0;
     let selectedIdx = null;
-    let history = [];
-
-    // --- LOGIQUE CORE ---
-
-    function initStats() {
-        const best = localStorage.getItem('sns_best') || 0;
-        const last = localStorage.getItem('sns_last') || '--';
-        document.getElementById('best-score-display').innerText = `${best}/65`;
-        document.getElementById('last-score-display').innerText = last === '--' ? '--' : `${last}/65`;
-    }
 
     function startGame() {
-        switchScreen('quiz-ui');
-        currentQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
-        currentIdx = 0; score = 0; history = [];
+        document.getElementById('lobby').classList.remove('active');
+        document.getElementById('quiz-ui').classList.add('active');
+        currentQuestions = [...questions].sort(() => Math.random() - 0.5);
         showQuestion();
     }
 
     function showQuestion() {
         const q = currentQuestions[currentIdx];
         selectedIdx = null;
-        
-        // UI
-        document.getElementById('cat-label').innerText = q.cat.toUpperCase();
-        document.getElementById('counter-label').innerText = `${currentIdx + 1} / 65`;
-        document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / 65) * 100}%`;
+        document.getElementById('analysis-box').style.display = 'none';
+        document.getElementById('cat-label').innerText = q.cat;
+        document.getElementById('counter-label').innerText = `${currentIdx + 1} / ${currentQuestions.length}`;
+        document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / currentQuestions.length) * 100}%`;
         document.getElementById('q-text').innerText = q.q;
         
         const grid = document.getElementById('options-grid');
         grid.innerHTML = '';
-        
         q.options.forEach((opt, i) => {
             const div = document.createElement('div');
             div.className = 'option';
             div.innerText = opt;
-            div.onclick = () => selectOption(i, div);
+            div.onclick = () => {
+                if(document.getElementById('next-btn').style.display === 'block') return;
+                selectedIdx = i;
+                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                div.classList.add('selected');
+                document.getElementById('validate-btn').disabled = false;
+            };
             grid.appendChild(div);
         });
-
         document.getElementById('validate-btn').style.display = 'block';
         document.getElementById('validate-btn').disabled = true;
         document.getElementById('next-btn').style.display = 'none';
-    }
-
-    function selectOption(idx, el) {
-        if (document.getElementById('next-btn').style.display === 'block') return;
-        selectedIdx = idx;
-        document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-        el.classList.add('selected');
-        document.getElementById('validate-btn').disabled = false;
     }
 
     function validateAnswer() {
@@ -317,11 +162,12 @@
         const isCorrect = selectedIdx === q.correct;
         if(isCorrect) score++;
         
-        history.push({ q: q.q, user: q.options[selectedIdx], correct: q.options[q.correct], status: isCorrect });
-        
         const options = document.querySelectorAll('.option');
         options[q.correct].classList.add('correct');
         if(!isCorrect) options[selectedIdx].classList.add('wrong');
+        
+        document.getElementById('analysis-content').innerHTML = q.explain;
+        document.getElementById('analysis-box').style.display = 'block';
         
         document.getElementById('validate-btn').style.display = 'none';
         document.getElementById('next-btn').style.display = 'block';
@@ -329,38 +175,15 @@
 
     function nextQuestion() {
         currentIdx++;
-        if(currentIdx < 65) showQuestion();
+        if(currentIdx < currentQuestions.length) showQuestion();
         else finishGame();
     }
 
     function finishGame() {
-        switchScreen('recap');
-        document.getElementById('final-score').innerText = `${score}/65`;
-        
-        // Stats
-        localStorage.setItem('sns_last', score);
-        const best = localStorage.getItem('sns_best') || 0;
-        if(score > best) localStorage.setItem('sns_best', score);
-        
-        // Recap List
-        const list = document.getElementById('recap-list');
-        list.innerHTML = history.map((h, i) => `
-            <div class="recap-item ${h.status ? 'is-correct' : ''}">
-                <div style="font-weight:bold; margin-bottom:5px;">${i+1}. ${h.q}</div>
-                <div style="font-size:0.9rem; color:${h.status ? 'var(--success)' : 'var(--danger)'}">
-                    Réponse : ${h.user}
-                </div>
-                ${!h.status ? `<div style="font-size:0.9rem; color:var(--success)">Correction : ${h.correct}</div>` : ''}
-            </div>
-        `).join('');
+        document.getElementById('quiz-ui').classList.remove('active');
+        document.getElementById('recap').classList.add('active');
+        document.getElementById('final-score').innerText = `${score}/${currentQuestions.length}`;
     }
-
-    function switchScreen(id) {
-        document.querySelectorAll('#game-container > div').forEach(div => div.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    initStats();
 </script>
 </body>
 </html>
