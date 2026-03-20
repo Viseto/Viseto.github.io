@@ -5,63 +5,189 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SNS Certification Training</title>
     <style>
-        :root { --primary: #38bdf8; --success: #22c55e; --danger: #ef4444; --bg: #020617; --card: #1e293b; --text: #f8fafc; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        #game-container { background: var(--card); width: 95%; max-width: 900px; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid #334155; }
-        #lobby { display: flex; padding: 40px; gap: 40px; }
-        .leaderboard { flex: 1; background: #0f172a; padding: 20px; border-radius: 15px; border: 1px solid #334155; min-width: 250px; }
-        .leaderboard h2 { font-size: 18px; color: var(--primary); margin: 0 0 15px 0; text-align: center; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-        .lb-list { list-style: none; padding: 0; margin: 0; font-size: 14px; max-height: 300px; overflow-y: auto; }
-        .lb-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e293b; }
-        .main-menu { flex: 2; text-align: center; }
-        h1 { color: var(--primary); font-size: 32px; margin-bottom: 10px; }
-        input#username { width: 80%; padding: 15px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 18px; margin: 20px auto; text-align: center; outline: none; }
-        .btn-start { background: var(--primary); color: #020617; padding: 18px 45px; border: none; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        #quiz-ui, #recap { display: none; padding: 40px; }
-        .option { background: #334155; border: 2px solid transparent; padding: 18px; border-radius: 15px; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
+        :root {
+            --primary: #0ea5e9;
+            --primary-hover: #0284c7;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #game-container {
+            background: var(--card);
+            width: 95%;
+            max-width: 800px;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            padding: 2rem;
+        }
+
+        /* Lobby Style */
+        .hero { text-align: center; padding: 2rem 0; }
+        .hero h1 { font-size: 2.5rem; margin: 0; color: var(--primary); letter-spacing: -1px; }
+        .hero p { color: var(--text-dim); margin-top: 0.5rem; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: #0f172a;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+
+        .stat-card span { display: block; font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
+        .stat-card b { font-size: 1.5rem; color: var(--primary); }
+
+        /* Quiz UI */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #334155;
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-box h2 { font-size: 1.4rem; line-height: 1.5; margin-bottom: 2rem; }
+
+        .options-grid { display: grid; gap: 0.75rem; }
+
+        .option {
+            background: #334155;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            font-size: 1.05rem;
+        }
+
+        .option:hover { background: #475569; }
         .option.selected { border-color: var(--primary); background: #1e293b; }
-        .option.correct { background: var(--success) !important; color: white; }
-        .option.wrong { background: var(--danger) !important; color: white; }
-        .recap-scroll { text-align: left; max-height: 350px; overflow-y: auto; background: #0f172a; padding: 20px; border-radius: 15px; margin-top: 25px; border: 1px solid #334155; }
+        .option.correct { background: var(--success) !important; border-color: var(--success); }
+        .option.wrong { background: var(--danger) !important; border-color: var(--danger); }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 1.5rem;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-next { background: var(--success); color: white; display: none; }
+
+        /* Recap */
+        .recap-item {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--danger);
+        }
+        .recap-item.is-correct { border-left-color: var(--success); }
+
+        #lobby, #quiz-ui, #recap { display: none; }
+        #lobby.active, #quiz-ui.active, #recap.active { display: block; }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <div id="lobby">
-        <div class="leaderboard">
-            <h2>🏆 TES SCORES</h2>
-            <ul id="lb-list" class="lb-list"></ul>
-            <div style="margin-top:20px; font-size:11px; text-align:center; color:#64748b;">
-                Parties mondiales finies : <br>
-                <b id="global-hits" style="color:var(--primary); font-size:14px;">...</b>
+    <div id="lobby" class="active">
+        <div class="hero">
+            <h1>SNS Certification</h1>
+            <p>Préparation intensive Stormshield (65 questions)</p>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span>Meilleur Score</span>
+                <b id="best-score-display">0/65</b>
+            </div>
+            <div class="stat-card">
+                <span>Dernière Tentative</span>
+                <b id="last-score-display">--</b>
             </div>
         </div>
-        <div class="main-menu">
-            <div style="font-size: 60px;">🛡️</div>
-            <h1>SNS QUIZ GAME</h1>
-            <input type="text" id="username" placeholder="Pseudo admin..." maxlength="15">
-            <button class="btn-start" onclick="startGame()">DÉMARRER</button>
-        </div>
+        <button class="btn btn-primary" onclick="startGame()">DÉMARRER LE TEST</button>
     </div>
 
     <div id="quiz-ui">
-        <div id="q-text" style="font-size:22px; margin-bottom:30px; font-weight:600;"></div>
-        <div id="q-options"></div>
-        <button id="validate-btn" class="btn-start" style="width:100%; margin-top:20px;" onclick="validateAnswer()" disabled>VALIDER</button>
-        <button id="next-btn" class="btn-start" style="width:100%; margin-top:20px; display:none; background:var(--success)" onclick="nextQuestion()">SUIVANT &raquo;</button>
+        <div class="quiz-header">
+            <span id="cat-label" style="color: var(--primary); font-weight: 800; font-size: 0.9rem;">CATÉGORIE</span>
+            <span id="counter-label" style="font-weight: bold;">1 / 65</span>
+        </div>
+        <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <div class="question-box">
+            <h2 id="q-text">Chargement de la question...</h2>
+            <div id="options-grid" class="options-grid"></div>
+        </div>
+        <button id="validate-btn" class="btn btn-primary" onclick="validateAnswer()" disabled>VALIDER LA RÉPONSE</button>
+        <button id="next-btn" class="btn btn-next" onclick="nextQuestion()">QUESTION SUIVANTE &raquo;</button>
     </div>
 
     <div id="recap">
-        <h1>Analyse Terminée</h1>
-        <div id="final-score" style="font-size: 48px; color: var(--primary); margin: 10px 0;">0 / 65</div>
-        <div class="recap-scroll" id="recap-list"></div>
-        <button class="btn-start" style="width:100%; margin-top:20px;" onclick="location.reload()">RETOUR AU MENU</button>
+        <div class="hero">
+            <h1 id="final-result-title">Test terminé</h1>
+            <div id="final-score" style="font-size: 4rem; font-weight: 900; margin: 1rem 0;">0/65</div>
+        </div>
+        <div id="recap-list" style="max-height: 300px; overflow-y: auto; padding-right: 10px;"></div>
+        <button class="btn btn-primary" onclick="location.reload()">RETOUR AU MENU</button>
     </div>
 </div>
 
 <script>
-    // --- QUESTIONS (Raccourci pour l'exemple, mets tes 65 ici) ---
     const allQuestions = [
         { cat: "Usine", q: "Combien de politiques de filtrage NAT locales peuvent être actives à la fois ?", options: ["1", "5", "10"], correct: 0 },
         { cat: "Usine", q: "Par défaut, la durée de vie d’un tunnel VPN SSL est de :", options: ["3 600s", "14 400s", "36 000s"], correct: 1 },
@@ -130,64 +256,73 @@
         { cat: "Objets", q: "Objet FQDN : adresse via DNS ?", options: ["Vrai", "Faux"], correct: 0 }
     ];
 
-    let gameQuestions = [], currentIdx = 0, selectedIdx = null, score = 0, playerName = "", history = [];
+    let currentQuestions = [];
+    let currentIdx = 0;
+    let score = 0;
+    let selectedIdx = null;
+    let history = [];
 
-    // --- LEADERBOARD & COUNTER ---
-    async function initLobby() {
-        // Chargement classement local
-        const saved = JSON.parse(localStorage.getItem('sns_results_local') || '[]');
-        document.getElementById('lb-list').innerHTML = saved.sort((a,b)=>b.score - a.score).slice(0, 10).map(i => 
-            `<li class="lb-item"><span>${i.name}</span> <b>${i.score}/65</b></li>`).join('') || '<li class="lb-item">Aucun record</li>';
+    // --- LOGIQUE CORE ---
 
-        // CountAPI : On crée une clé unique "sns_quiz_final_count" pour tout le monde
-        try {
-            const resp = await fetch('https://api.countapi.xyz/get/sns_quiz_final_count/hits');
-            const data = await resp.json();
-            document.getElementById('global-hits').innerText = data.value;
-        } catch(e) { 
-            // Si la clé n'existe pas, on l'initialise
-            fetch('https://api.countapi.xyz/create?namespace=sns_quiz_final_count&key=hits&value=0');
-            document.getElementById('global-hits').innerText = "0";
-        }
+    function initStats() {
+        const best = localStorage.getItem('sns_best') || 0;
+        const last = localStorage.getItem('sns_last') || '--';
+        document.getElementById('best-score-display').innerText = `${best}/65`;
+        document.getElementById('last-score-display').innerText = last === '--' ? '--' : `${last}/65`;
     }
 
     function startGame() {
-        playerName = document.getElementById('username').value.trim();
-        if(!playerName) return alert("Choisis un pseudo !");
-        document.getElementById('lobby').style.display = 'none';
-        document.getElementById('quiz-ui').style.display = 'block';
-        gameQuestions = [...allQuestions].sort(()=>Math.random()-0.5);
+        switchScreen('quiz-ui');
+        currentQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
+        currentIdx = 0; score = 0; history = [];
         showQuestion();
     }
 
     function showQuestion() {
-        const q = gameQuestions[currentIdx];
+        const q = currentQuestions[currentIdx];
+        selectedIdx = null;
+        
+        // UI
+        document.getElementById('cat-label').innerText = q.cat.toUpperCase();
+        document.getElementById('counter-label').innerText = `${currentIdx + 1} / 65`;
+        document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / 65) * 100}%`;
         document.getElementById('q-text').innerText = q.q;
-        const optsDiv = document.getElementById('q-options');
-        optsDiv.innerHTML = ''; selectedIdx = null;
+        
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
+        
         q.options.forEach((opt, i) => {
             const div = document.createElement('div');
-            div.className = 'option'; div.innerText = opt;
-            div.onclick = () => {
-                if(document.getElementById('next-btn').style.display === 'block') return;
-                selectedIdx = i;
-                document.querySelectorAll('.option').forEach((el, idx) => el.classList.toggle('selected', idx === i));
-                document.getElementById('validate-btn').disabled = false;
-            };
-            optsDiv.appendChild(div);
+            div.className = 'option';
+            div.innerText = opt;
+            div.onclick = () => selectOption(i, div);
+            grid.appendChild(div);
         });
+
         document.getElementById('validate-btn').style.display = 'block';
         document.getElementById('validate-btn').disabled = true;
         document.getElementById('next-btn').style.display = 'none';
     }
 
+    function selectOption(idx, el) {
+        if (document.getElementById('next-btn').style.display === 'block') return;
+        selectedIdx = idx;
+        document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('validate-btn').disabled = false;
+    }
+
     function validateAnswer() {
-        const q = gameQuestions[currentIdx];
+        const q = currentQuestions[currentIdx];
         const isCorrect = selectedIdx === q.correct;
         if(isCorrect) score++;
-        history.push({q: q.q, user: q.options[selectedIdx], correct: q.options[q.correct], status: isCorrect});
-        document.querySelectorAll('.option')[q.correct].classList.add('correct');
-        if(!isCorrect) document.querySelectorAll('.option')[selectedIdx].classList.add('wrong');
+        
+        history.push({ q: q.q, user: q.options[selectedIdx], correct: q.options[q.correct], status: isCorrect });
+        
+        const options = document.querySelectorAll('.option');
+        options[q.correct].classList.add('correct');
+        if(!isCorrect) options[selectedIdx].classList.add('wrong');
+        
         document.getElementById('validate-btn').style.display = 'none';
         document.getElementById('next-btn').style.display = 'block';
     }
@@ -199,25 +334,33 @@
     }
 
     function finishGame() {
-        document.getElementById('quiz-ui').style.display = 'none';
-        document.getElementById('recap').style.display = 'block';
-        document.getElementById('final-score').innerText = score + " / 65";
-
-        // Sauvegarde locale (le classement s'affichera sur TON ordi)
-        let saved = JSON.parse(localStorage.getItem('sns_results_local') || '[]');
-        saved.push({name: playerName, score: score});
-        localStorage.setItem('sns_results_local', JSON.stringify(saved));
-
-        // Incrémenter le compteur mondial CountAPI
-        fetch('https://api.countapi.xyz/hit/sns_quiz_final_count/hits');
-
-        document.getElementById('recap-list').innerHTML = history.map(h => `
-            <div style="border-bottom:1px solid #334155; padding:5px;">
-                <b>${h.q}</b><br><span style="color:${h.status?'#22c55e':'#ef4444'}">${h.user}</span>
-            </div>`).join('');
+        switchScreen('recap');
+        document.getElementById('final-score').innerText = `${score}/65`;
+        
+        // Stats
+        localStorage.setItem('sns_last', score);
+        const best = localStorage.getItem('sns_best') || 0;
+        if(score > best) localStorage.setItem('sns_best', score);
+        
+        // Recap List
+        const list = document.getElementById('recap-list');
+        list.innerHTML = history.map((h, i) => `
+            <div class="recap-item ${h.status ? 'is-correct' : ''}">
+                <div style="font-weight:bold; margin-bottom:5px;">${i+1}. ${h.q}</div>
+                <div style="font-size:0.9rem; color:${h.status ? 'var(--success)' : 'var(--danger)'}">
+                    Réponse : ${h.user}
+                </div>
+                ${!h.status ? `<div style="font-size:0.9rem; color:var(--success)">Correction : ${h.correct}</div>` : ''}
+            </div>
+        `).join('');
     }
 
-    initLobby();
+    function switchScreen(id) {
+        document.querySelectorAll('#game-container > div').forEach(div => div.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    initStats();
 </script>
 </body>
 </html>
