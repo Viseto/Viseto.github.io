@@ -3,105 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNS Certification - Entraînement</title>
+    <title>SNS Certification - Masterclass</title>
     <style>
-        /* Thème "Eye-Care" : Couleurs douces et reposantes pour l'écran */
+        /* Thème "Eye-Care" (Sombre, doux pour les yeux) */
         :root {
-            --bg-page: #0f172a;        /* Bleu nuit très sombre */
-            --bg-card: #1e293b;        /* Ardoise sombre */
+            --bg-page: #0f172a;        /* Bleu nuit profond */
+            --bg-card: #1e293b;        /* Ardoise */
             --bg-option: #334155;      /* Ardoise claire */
             --bg-option-hover: #475569;
-            --primary: #38bdf8;        /* Bleu ciel doux */
-            --success: #10b981;        /* Vert émeraude (moins agressif que le vert pur) */
+            --primary: #38bdf8;        /* Bleu Stormshield */
+            --success: #10b981;        /* Vert émeraude */
             --danger: #ef4444;         /* Rouge corail */
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg-page);
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-page);
+            color: var(--text-main); margin: 0; display: flex; justify-content: center;
+            align-items: center; min-height: 100vh; padding: 20px; box-sizing: border-box;
         }
 
         #app-container {
-            background-color: var(--bg-card);
-            width: 100%;
-            max-width: 850px;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            border: 1px solid #334155;
-            padding: 40px;
-            box-sizing: border-box;
+            background-color: var(--bg-card); width: 100%; max-width: 900px;
+            border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid #334155; padding: 40px; box-sizing: border-box;
         }
 
-        /* LOBBY */
+        /* LOBBY & RECAP */
         .header { text-align: center; margin-bottom: 40px; }
         .header h1 { color: var(--primary); font-size: 2.5rem; margin: 0 0 10px 0; }
         .header p { color: var(--text-muted); font-size: 1.1rem; margin: 0; }
 
-        .stats-container {
-            display: flex; justify-content: space-around; background: var(--bg-page);
-            padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #334155;
-        }
+        .stats-container { display: flex; justify-content: space-around; background: var(--bg-page); padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #334155; }
         .stat-box { text-align: center; }
         .stat-box span { display: block; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; margin-bottom: 5px; }
-        .stat-box strong { font-size: 1.8rem; color: var(--primary); }
+        .stat-box strong { font-size: 2rem; color: var(--primary); }
 
-        .btn {
-            width: 100%; background: var(--primary); color: #020617; padding: 16px;
-            border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold;
-            cursor: pointer; transition: 0.2s;
-        }
+        .btn { width: 100%; background: var(--primary); color: #020617; padding: 16px; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .btn-next { background: var(--success); color: white; display: none; margin-top: 15px; }
 
         /* QUIZ */
         .quiz-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .badge { background: rgba(56, 189, 248, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-weight: bold; border: 1px solid rgba(56, 189, 248, 0.2); }
+        .badge { background: rgba(56, 189, 248, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-weight: bold; border: 1px solid rgba(56, 189, 248, 0.2); text-transform: uppercase;}
         .progress-text { color: var(--text-muted); font-weight: bold; }
         
         .progress-bar { width: 100%; height: 8px; background: var(--bg-page); border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
 
-        .question { font-size: 1.4rem; font-weight: 600; line-height: 1.5; margin-bottom: 30px; }
+        .question { font-size: 1.3rem; font-weight: 600; line-height: 1.5; margin-bottom: 30px; }
         
         .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-        .option {
-            background: var(--bg-option); padding: 18px 20px; border-radius: 12px;
-            cursor: pointer; border: 2px solid transparent; transition: 0.2s;
-            font-size: 1.1rem; display: flex; align-items: center;
-        }
+        .option { background: var(--bg-option); padding: 16px 20px; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; font-size: 1.05rem; display: flex; align-items: center; }
         .option:hover { background: var(--bg-option-hover); }
         .option.selected { border-color: var(--primary); background: rgba(56, 189, 248, 0.05); }
         .option.correct { background: var(--success) !important; color: white; border-color: var(--success); }
         .option.wrong { background: var(--danger) !important; color: white; border-color: var(--danger); }
 
-        /* EXPLICATION */
-        .explanation-box {
-            display: none; background: var(--bg-page); border-left: 4px solid var(--primary);
-            padding: 20px; border-radius: 0 12px 12px 0; margin-bottom: 25px;
-            animation: fadeIn 0.4s ease;
-        }
-        .explanation-title { color: var(--primary); font-weight: bold; margin-bottom: 8px; display: block; text-transform: uppercase; font-size: 0.9rem; }
-        .explanation-text { color: #cbd5e1; line-height: 1.6; font-size: 1rem; }
+        /* EXPLICATION (Analyse) */
+        .explanation-box { display: none; background: var(--bg-page); border-left: 4px solid var(--primary); padding: 20px; border-radius: 0 12px 12px 0; margin-bottom: 25px; animation: fadeIn 0.4s ease; }
+        .explanation-title { color: var(--primary); font-weight: bold; margin-bottom: 12px; display: block; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px;}
+        .explanation-text { color: #cbd5e1; line-height: 1.6; font-size: 0.95rem; }
+        .explanation-text b { color: white; }
 
         /* RECAP */
-        .recap-item {
-            background: var(--bg-page); padding: 15px; border-radius: 10px; margin-bottom: 15px;
-            border-left: 4px solid var(--danger);
-        }
+        .recap-item { background: var(--bg-page); padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid var(--danger); text-align: left;}
         .recap-item.is-correct { border-left-color: var(--success); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         .screen { display: none; }
         .screen.active { display: block; }
     </style>
@@ -111,21 +82,21 @@
 <div id="app-container">
     <div id="screen-lobby" class="screen active">
         <div class="header">
-            <div style="font-size: 3rem; margin-bottom: 10px;">🛡️</div>
+            <div style="font-size: 4rem; margin-bottom: 10px;">🛡️</div>
             <h1>SNS Certification</h1>
-            <p>Mode Entraînement Intensif (Auto-Correction)</p>
+            <p>65 Questions - Mode Auto-Correction Détaillé</p>
         </div>
         <div class="stats-container">
             <div class="stat-box">
-                <span>Meilleur Score</span>
+                <span>Meilleur Score Local</span>
                 <strong id="stat-best">0/65</strong>
             </div>
             <div class="stat-box">
-                <span>Dernier Essai</span>
+                <span>Dernière Session</span>
                 <strong id="stat-last">--</strong>
             </div>
         </div>
-        <button class="btn" onclick="startQuiz()">LANCER LA SESSION</button>
+        <button class="btn" onclick="startQuiz()">LANCER L'ENTRAÎNEMENT</button>
     </div>
 
     <div id="screen-quiz" class="screen">
@@ -136,7 +107,6 @@
         <div class="progress-bar"><div class="progress-fill" id="progress-bar"></div></div>
         
         <div class="question" id="q-text">Chargement de la question...</div>
-        
         <div class="options" id="q-options"></div>
 
         <div class="explanation-box" id="explanation-box">
@@ -150,85 +120,212 @@
 
     <div id="screen-recap" class="screen">
         <div class="header">
-            <h1>Session Terminée</h1>
-            <p>Bilan de tes compétences</p>
+            <h1>Examen Terminé</h1>
+            <p>Voici ton bilan de compétences</p>
         </div>
         <div style="text-align: center; font-size: 5rem; font-weight: 900; color: var(--primary); margin: 20px 0;" id="final-score">0/65</div>
-        
         <div style="max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px;" id="recap-list"></div>
-        
         <button class="btn" onclick="location.reload()">RETOURNER À L'ACCUEIL</button>
     </div>
 </div>
 
 <script>
-    // --- BASE DE DONNÉES DES 65 QUESTIONS AVEC EXPLICATIONS ---
+    // --- BASE DE DONNÉES DES 65 QUESTIONS AVEC EXPLICATIONS DÉTAILLÉES ---
     const allQuestions = [
-        { cat: "Usine", q: "Combien de politiques de filtrage NAT locales peuvent être actives à la fois ?", options: ["1", "5", "10"], correct: 0, explain: "Le moteur Stormshield ne peut compiler et appliquer qu'un seul slot (politique) local à la fois pour garantir la performance. Les autres peuvent être préparés mais restent inactifs." },
-        { cat: "Usine", q: "Par défaut, la durée de vie d’un tunnel VPN SSL est de :", options: ["3 600s", "14 400s", "36 000s"], correct: 1, explain: "Par défaut, la durée est fixée à 14 400 secondes (soit 4 heures). 3600s est souvent utilisé pour IPsec, mais pas pour le VPN SSL par défaut." },
-        { cat: "Usine", q: "LDAP interne : l’authentification s’effectue obligatoirement par mot de passe ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le LDAP (Lightweight Directory Access Protocol) gère des annuaires d'utilisateurs et requiert systématiquement un mot de passe pour valider l'identité." },
-        { cat: "Usine", q: "Firewall en configuration usine :", options: ["Bloque tout", "Bloque tout sauf pings et ports admin", "Laisse tout passer"], correct: 1, explain: "Par sécurité, Stormshield bloque presque tout par défaut. Il autorise uniquement l'ICMP (ping) et les accès d'administration (HTTPS/SSH) sur l'interface interne (IN) pour permettre la prise en main." },
-        { cat: "Usine", q: "Si le mot de passe 'admin' est inchangé, l'interface affiche une erreur critique ?", options: ["Oui", "Non"], correct: 0, explain: "Oui, c'est une mesure de sécurité stricte. Tant que le mot de passe d'usine (admin/admin) n'est pas modifié, le tableau de bord affichera une alerte critique permanente." },
-        { cat: "Technique", q: "Deux VLAN peuvent-ils être rattachés à la même interface physique ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. C'est le principe du trunking (norme 802.1Q). Une seule interface physique peut tagger et transporter le trafic de dizaines de VLAN différents." },
-        { cat: "Technique", q: "Plusieurs adresses IP sur une seule interface du firewall ?", options: ["Non", "Oui, dans tous les cas", "Seulement modèle SN510+"], correct: 1, explain: "Oui, c'est possible via le système d'Alias IP. Une interface peut répondre à plusieurs adresses IP dans le même sous-réseau ou dans des sous-réseaux différents." },
-        { cat: "Technique", q: "Le nombre maximum d’interfaces peut-il être modifié ?", options: ["Oui", "Non, dépend du modèle", "Seulement via CLI"], correct: 1, explain: "Non. Le nombre maximum d'interfaces (physiques ou virtuelles/VLAN) est une limitation physique et logicielle (licence) directement liée au modèle de l'appliance achetée." },
-        { cat: "Technique", q: "Limiter la taille des paquets ICMP (ping) entrants ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. C'est une protection classique du module IPS de Stormshield pour éviter les attaques par débordement (Ping of Death) en limitant la taille de la charge utile." },
-        { cat: "Admin", q: "Sur appliances physiques, copier la partition active vers la passive ?", options: ["Oui", "Non"], correct: 0, explain: "Oui. Les boîtiers physiques Stormshield disposent d'un système à double partition (Active/Backup). On peut cloner la partition fonctionnelle vers la partition de secours en un clic." },
-        { cat: "Admin", q: "Basculer de partition principale à secours sans redémarrage ?", options: ["Oui", "Non"], correct: 1, explain: "Non. Changer de partition modifie le système d'exploitation de base. Un redémarrage (reboot) est obligatoirement requis pour booter sur la nouvelle partition." },
-        { cat: "Admin", q: "Service NTP : a besoin du fuseau horaire pour l’heure locale ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le serveur NTP distribue toujours l'heure en format UTC universel. C'est le firewall qui applique son propre fuseau horaire local pour afficher la bonne heure dans les logs." },
-        { cat: "Admin", q: "Fréquence Active Update paramétrable depuis l’interface ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Dans les modules de mise à jour, l'administrateur peut choisir l'intervalle de vérification des signatures (IPS, Antivirus, etc.) vers les serveurs Stormshield." },
-        { cat: "Admin", q: "Le firewall peut être serveur DHCP ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le SNS intègre un service DHCP complet pour distribuer des adresses IP, des passerelles et des DNS aux machines des réseaux locaux connectés." },
-        { cat: "Admin", q: "Navigateurs supportés :", options: ["Firefox, Edge, Chrome", "Opera, Safari", "Uniquement Firefox"], correct: 0, explain: "Stormshield supporte officiellement les principaux navigateurs modernes (Chrome, Firefox, Edge) pour son interface web d'administration HTML5." },
-        { cat: "Logs", q: "Modifier le % d'espace disque par famille de traces ?", options: ["Oui", "Non"], correct: 0, explain: "Oui. L'administrateur peut ajuster finement les quotas. Par exemple, allouer 60% du disque aux logs de filtrage et seulement 10% aux logs système." },
-        { cat: "Logs", q: "Logs pleins : que se passe-t-il ?", options: ["Arrêt firewall", "Rotation automatique", "Envoi d'un ping"], correct: 1, explain: "Rotation automatique. Le firewall supprime les fichiers de journaux les plus anciens pour faire de la place aux nouveaux. Il ne s'arrête jamais de filtrer pour un problème de log." },
-        { cat: "Logs", q: "Visualiser les journaux via Wireshark ?", options: ["Oui", "Non (Interface Admin)"], correct: 1, explain: "Non. Wireshark lit des captures réseau (fichiers .pcap). Les logs Stormshield sont des fichiers d'événements texte gérés via l'interface web ou envoyés vers un Syslog." },
-        { cat: "Logs", q: "Le RGPD a-t-il un impact sur la gestion des logs ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le RGPD impose des durées de rétention spécifiques et recommande l'anonymisation des données personnelles (comme les adresses IP ou noms d'utilisateurs) contenues dans les logs." },
-        { cat: "Logs", q: "Arrêter l’écriture des événements pour une catégorie ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Pour économiser de l'espace ou des ressources CPU, on peut désactiver totalement la journalisation de certaines catégories (ex: alarmes mineures)." },
-        { cat: "Objets", q: "Plusieurs objets FQDN en destination d'une règle ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. On peut créer des groupes d'objets contenant de multiples FQDN (noms de domaine) et les placer en destination d'une seule règle de filtrage." },
-        { cat: "Objets", q: "Réseau machine : résolution ARP périodique ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. En forçant la résolution ARP sur un objet machine, le firewall s'assure que l'adresse IP correspond toujours à la bonne adresse physique (MAC) associée, évitant l'usurpation." },
-        { cat: "Objets", q: "Serveur DNS : sert à quoi ?", options: ["Associer nom et IP", "Envoyer des mails", "Faire du NAT"], correct: 0, explain: "Associer un nom à une IP. Le DNS (Domain Name System) est l'annuaire qui traduit un nom humainement lisible (google.com) en adresse IP compréhensible par le réseau." },
-        { cat: "Objets", q: "Équivalent objet 'Internet' :", options: ["Any", "Network_in", "Firewall_internals"], correct: 0, explain: "L'objet 'Any' représente toutes les adresses IP (0.0.0.0/0). En filtrage, lorsqu'on cible 'Internet', on utilise généralement l'objet global 'Any' ou 'Network_out'." },
-        { cat: "Objets", q: "Norme des VLAN sur Stormshield :", options: ["802.1Q", "RFC 894", "Hyperlan"], correct: 0, explain: "802.1Q est la norme IEEE universelle de l'industrie pour le taggage des trames VLAN sur les réseaux Ethernet. Stormshield l'utilise nativement." },
-        { cat: "Objets", q: "Plus de deux interfaces dans un bridge ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Un bridge (pont) agit comme un switch. On peut y intégrer 3, 4 ou plus d'interfaces physiques qui partageront toutes le même plan d'adressage IP." },
-        { cat: "Routage", q: "Répartition de charge possible pour :", options: ["Défaut", "Politique", "Dynamique", "Tous les types précités"], correct: 3, explain: "Tous. Stormshield permet de faire du Load Balancing (répartition de charge) sur des routes statiques, sur du routage PBR (politique) et les protocoles dynamiques le gèrent nativement." },
-        { cat: "Routage", q: "Route statique : interface de sortie obligatoire ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. On indique l'adresse de la passerelle (Gateway). Le firewall déterminera automatiquement l'interface de sortie en fonction du sous-réseau de cette passerelle." },
-        { cat: "Routage", q: "Priorité par défaut (1 = prioritaire) :", options: ["PBR > Statique > Dynamique", "Statique > PBR > Dynamique", "Défaut > Statique"], correct: 0, explain: "Le Routage par Politique (PBR défini dans le filtrage) écrase tout le reste. Ensuite viennent les routes statiques manuelles, et enfin les routes apprises dynamiquement." },
-        { cat: "Routage", q: "NAT : modifier IP Source ET IP Destination simultanément ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. On appelle cela le Double NAT. Une seule règle permet de translater la source (SNAT) et la destination (DNAT) en même temps sur un même paquet." },
-        { cat: "Routage", q: "Poids 50% GW1, 25% GW2, 25% GW3 :", options: ["2/1/1", "4/2/2", "Les deux"], correct: 2, explain: "Les deux. Le système gère des ratios. 2/1/1 équivaut mathématiquement à 4/2/2 (La moitié du trafic sur GW1, le reste divisé en deux sur GW2 et GW3)." },
-        { cat: "Filtrage", q: "Règle pour serveur Web DMZ accessible d'Internet :", options: ["Internet vers IP Publique", "Internet vers IP Privée", "DMZ vers Internet"], correct: 0, explain: "Le pare-feu évalue la règle AVANT d'appliquer le NAT de destination. Le trafic provenant d'Internet vise donc l'IP publique du firewall, c'est ce qui doit être autorisé." },
-        { cat: "Filtrage", q: "IPS Stormshield est-il propriétaire ?", options: ["Oui", "Non (Open Source)"], correct: 0, explain: "Oui, le moteur IPS (Intrusion Prevention System) basé sur l'analyse protocolaire en temps réel (ASQ) est une technologie propriétaire et brevetée par Stormshield." },
-        { cat: "Filtrage", q: "Ordre de traitement des règles :", options: ["Par ordre d'apparition", "Plus restrictive en premier", "Bloquer en premier"], correct: 0, explain: "Le moteur lit les règles de haut en bas (par ordre d'apparition). Dès qu'un paquet correspond à une règle, l'action est appliquée et la lecture s'arrête (sauf pour les règles 'passer')." },
-        { cat: "Filtrage", q: "L'action 'Bloquer' déclenche une alarme ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. Bloquer un paquet le rejette silencieusement. Pour déclencher une alarme visible dans le tableau de bord, il faut configurer un niveau de trace ou associer une inspection IPS." },
-        { cat: "Filtrage", q: "Filtrage par SNI (certificat) utilisable sur :", options: ["HTTP", "HTTPS", "Les deux"], correct: 1, explain: "HTTPS. Le SNI (Server Name Indication) est une extension du protocole TLS utilisé dans HTTPS. En HTTP clair, on filtre simplement en lisant l'entête 'Host'." },
-        { cat: "VPN", q: "Standard IPsec défini par :", options: ["IETF (Internet)", "Stormshield", "Cisco"], correct: 0, explain: "IETF (Internet Engineering Task Force). IPsec est un standard ouvert mondial, ce qui garantit l'interopérabilité entre les firewalls Stormshield, Cisco, Fortinet, etc." },
-        { cat: "VPN", q: "Protocole de négociation IPsec :", options: ["IKE", "ESP", "AH"], correct: 0, explain: "IKE (Internet Key Exchange). C'est le protocole qui négocie les paramètres de sécurité et échange les clés (Phase 1 et 2) avant le transfert des données." },
-        { cat: "VPN", q: "Phases pour établir un tunnel IPsec ?", options: ["1", "2", "3"], correct: 1, explain: "2 phases. La Phase 1 établit un canal sécurisé d'administration (IKE SA). La Phase 2 établit le tunnel par lequel passeront les données utilisateurs (IPsec SA)." },
-        { cat: "VPN", q: "VPN SSL : droit d'accès global à tous ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. L'accès VPN SSL doit être accordé explicitement aux utilisateurs ou groupes dans l'annuaire ou la configuration, ce n'est jamais ouvert à tous par défaut." },
-        { cat: "VPN", q: "Keepalive IPsec se configure en :", options: ["Secondes", "Minutes", "Heures"], correct: 0, explain: "Secondes. Le protocole DPD (Dead Peer Detection) envoie des trames de test de vie toutes les X secondes pour vérifier si le tunnel est toujours actif." },
-        { cat: "VPN", q: "Chiffrement IPsec assuré par :", options: ["ESP", "AH", "L2TP"], correct: 0, explain: "ESP (Encapsulating Security Payload). C'est la partie d'IPsec qui encrypte la charge utile pour garantir la confidentialité des données transitant sur Internet." },
-        { cat: "Avancé", q: "Analyse antivirale sur flux HTTPS :", options: ["Oui, si déchiffrement", "Oui, toujours", "Non jamais"], correct: 0, explain: "Uniquement si on active le proxy SSL (déchiffrement). Sinon, le flux est crypté de bout en bout et l'antivirus du firewall ne voit qu'une suite de caractères incompréhensibles." },
-        { cat: "Avancé", q: "Breach Fighter nécessite 'Antivirus avancé' ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Breach Fighter est l'option de Sandboxing Cloud de Stormshield. Elle s'appuie sur le moteur d'Antivirus Avancé (ex: Kaspersky ou Bitdefender) pour faire le premier tri." },
-        { cat: "Avancé", q: "Extended Web Control évite le stockage local URL ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Au lieu de télécharger l'immense base de données d'URL sur le disque du firewall, l'EWC l'interroge en direct dans le Cloud de Stormshield." },
-        { cat: "Avancé", q: "HTTPS non déchiffré : certificat affiché est celui du proxy ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. Si le proxy SSL NE DÉCHIFFRE PAS, l'utilisateur voit le vrai certificat du serveur distant (ex: Google). S'il déchiffre, il voit le certificat généré par le firewall." },
-        { cat: "Avancé", q: "Proxy SSL activé via règle de filtrage ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le choix de déchiffrer ou non le trafic HTTPS se configure directement dans la colonne 'Inspection' d'une règle de filtrage." },
-        { cat: "Admin", q: "Sauvegarde partition active possible ?", options: ["Oui, tous modèles", "Physique seulement", "Virtuel seulement"], correct: 0, explain: "La notion de sauvegarde de la partition entière (backup-restore system) est disponible sur l'ensemble des appliances physiques pour assurer la haute disponibilité." },
-        { cat: "Technique", q: "Mode 'Transparent' :", options: ["Bridge (Interfaces pontées)", "Adressage par interface", "Aucune IP"], correct: 0, explain: "Le mode transparent se fait via un Bridge. Le firewall s'insère au milieu d'un réseau sans modifier le plan d'adressage IP des machines, agissant comme un switch filtrant." },
-        { cat: "Routage", q: "Routage sans NAT : champs modifiés ?", options: ["MAC Source/Destination", "IP Source/Destination", "Ports"], correct: 0, explain: "Lorsqu'un routeur (sans NAT) transmet un paquet, les adresses IP ne changent pas. Seules les adresses physiques (MAC) source et destination sont modifiées à chaque saut." },
-        { cat: "Logs", q: "Accès complet aux logs via code temporaire ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Pour respecter le RGPD, l'accès aux données sensibles des logs peut être verrouillé et ne s'ouvrir qu'avec un jeton temporaire fourni par un officier de sécurité." },
-        { cat: "Auth", q: "Auth LDAP interne : mot de passe obligatoire ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Comme évoqué, l'authentification sur une base LDAP interne ou externe requiert toujours la validation d'un mot de passe." },
-        { cat: "Filtrage", q: "Connexions externes analysées ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le moteur de prévention d'intrusion (IPS) analyse aussi bien le trafic venant d'Internet que celui venant du réseau local (LAN)." },
-        { cat: "Technique", q: "135.1.1.0/23 est une adresse :", options: ["Réseau", "Hôte", "Broadcast"], correct: 0, explain: "C'est une adresse réseau. Avec un masque /23, les adresses hôtes vont de 135.1.0.1 à 135.1.1.254. 135.1.1.0 fait partie de la plage mais l'adresse du sous-réseau est 135.1.0.0. *Note: Selon l'alignement binaire, 135.1.1.0 peut être vue comme hôte dans 135.1.0.0/23. Le quiz initial la donne comme Réseau, attention aux pièges IP.*" },
-        { cat: "VPN", q: "VPN entre 2 SNS :", options: ["IPsec", "SSL", "OpenVPN", "Tous"], correct: 3, explain: "Tous. Stormshield supporte historiquement IPsec pour le site-à-site, mais on peut aussi lier deux sites via des tunnels VPN SSL ou OpenVPN selon les besoins." },
-        { cat: "Admin", q: "Administration via :", options: ["Navigateur, CLI, SSH", "Telnet uniquement", "Console uniquement"], correct: 0, explain: "On peut administrer un firewall Stormshield graphiquement via HTTPS (Navigateur), en ligne de commande (CLI) directement sur le boîtier, ou à distance via SSH." },
-        { cat: "Filtrage", q: "Modifier l'action de plusieurs règles à la fois ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. L'interface SMC ou le mode d'édition multiple du firewall permet de sélectionner plusieurs règles et de changer leur action (passer/bloquer) simultanément." },
-        { cat: "Technique", q: "Interfaces VLAN toujours internes ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. Un VLAN peut très bien être configuré sur l'interface Externe (connectée à la box du FAI) si l'opérateur fournit le réseau internet via un VLAN spécifique." },
-        { cat: "Routage", q: "Translation statique :", options: ["1 IP Privée vers 1 IP Publique", "N vers 1", "1 vers N"], correct: 0, explain: "Le NAT statique (BIMAP) crée une correspondance fixe et bidirectionnelle : 1 adresse IP privée correspond toujours à 1 adresse IP publique précise." },
-        { cat: "Avancé", q: "Redirection port ICMP possible ?", options: ["Vrai", "Faux"], correct: 1, explain: "Faux. Le protocole ICMP (utilisé pour le ping) ne possède pas de notion de 'Ports' comme TCP ou UDP. On ne peut donc pas faire de redirection de port (Port Forwarding) sur l'ICMP." },
-        { cat: "Logs", q: "Tracer une règle NAT ?", options: ["Oui", "Non"], correct: 0, explain: "Oui. On peut activer les traces (logs) directement sur une règle NAT pour vérifier précisément comment le pare-feu modifie l'adresse source ou destination." },
-        { cat: "VPN", q: "IKEv1 : extrémités de trafic identiques ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Dans le standard IKEv1, les plans d'adressage réseaux locaux et distants configurés de chaque côté du tunnel doivent correspondre parfaitement en miroir." },
-        { cat: "Routage", q: "Algorithme répartition : quadruplet IP/Port ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Le mécanisme de load balancing utilise l'IP source, IP destination, Port source, Port destination pour s'assurer qu'une même session passe toujours par le même lien." },
-        { cat: "Auth", q: "Politique d'auth basée sur machine source ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Stormshield permet de demander une authentification différente (ou aucune) selon l'adresse IP, la MAC ou le réseau de la machine qui initie la connexion." },
-        { cat: "Objets", q: "Objet FQDN : adresse via DNS ?", options: ["Vrai", "Faux"], correct: 0, explain: "Vrai. Un objet FQDN (Fully Qualified Domain Name) demande au firewall d'interroger périodiquement un serveur DNS pour mettre à jour l'adresse IP associée à l'objet." }
+        { cat: "Usine", q: "Combien de politiques de filtrage NAT locales peuvent être actives à la fois ?", options: ["1", "5", "10"], correct: 0, 
+          explain: "<b>✅ 1 :</b> Le moteur ASQ ne compile et n'applique qu'un seul 'slot' (base de règles) à la fois pour garantir les performances.<br><b>❌ 5 et 10 :</b> Faux. On peut *préparer* jusqu'à 10 slots (ex: slot de secours), mais un seul est actif." },
+        
+        { cat: "Usine", q: "Par défaut, la durée de vie d’un tunnel VPN SSL est de :", options: ["3 600s", "14 400s", "36 000s"], correct: 1, 
+          explain: "<b>✅ 14 400s :</b> Soit 4 heures (une demi-journée). C'est le compromis sécurité/confort par défaut.<br><b>❌ 3 600s :</b> C'est la durée par défaut de la phase 2 d'IPsec. <br><b>❌ 36 000s :</b> Trop long pour des sessions utilisateurs sécurisées." },
+        
+        { cat: "Usine", q: "LDAP interne : l’authentification s’effectue obligatoirement par mot de passe ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Le protocole LDAP nécessite toujours un 'bind' avec un mot de passe pour valider l'identité.<br><b>❌ Faux :</b> Il n'existe pas d'authentification utilisateur anonyme autorisée pour accéder aux ressources internes." },
+        
+        { cat: "Usine", q: "Firewall en configuration usine :", options: ["Bloque tout", "Bloque tout sauf pings et ports admin", "Laisse tout passer"], correct: 1, 
+          explain: "<b>✅ Bloque tout sauf pings/admin :</b> Bloque tout par sécurité, mais laisse l'ICMP et HTTPS/SSH ouverts sur l'interface IN pour permettre la prise en main.<br><b>❌ Bloque tout :</b> Empêcherait la configuration initiale.<br><b>❌ Laisse tout passer :</b> Hérésie en cybersécurité." },
+        
+        { cat: "Usine", q: "Si le mot de passe 'admin' est inchangé, l'interface affiche une erreur critique ?", options: ["Oui", "Non"], correct: 0, 
+          explain: "<b>✅ Oui :</b> Garder 'admin/admin' déclenche une bannière rouge critique permanente dans le tableau de bord.<br><b>❌ Non :</b> Ce n'est pas un simple avertissement, c'est traité comme une vulnérabilité majeure." },
+        
+        { cat: "Technique", q: "Deux VLAN peuvent-ils être rattachés à la même interface physique ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> C'est le principe du Trunk 802.1Q. Une seule interface tagge les trames pour transporter plusieurs VLAN.<br><b>❌ Faux :</b> Limiter un VLAN par interface annulerait l'intérêt de la virtualisation réseau." },
+        
+        { cat: "Technique", q: "Plusieurs adresses IP sur une seule interface du firewall ?", options: ["Non", "Oui, dans tous les cas", "Seulement modèle SN510+"], correct: 1, 
+          explain: "<b>✅ Oui :</b> La fonctionnalité 'Alias IP' permet d'ajouter autant d'IP que souhaité sur n'importe quelle interface.<br><b>❌ Non / Modèles haut de gamme :</b> Faux, c'est une fonction réseau basique intégrée même sur le plus petit modèle." },
+        
+        { cat: "Technique", q: "Le nombre maximum d’interfaces peut-il être modifié ?", options: ["Oui", "Non, dépend du modèle", "Seulement via CLI"], correct: 1, 
+          explain: "<b>✅ Non :</b> Le nombre d'interfaces (physiques ou virtuelles) est bridé par la licence logicielle liée au matériel.<br><b>❌ Oui / CLI :</b> Forcer la création en ligne de commande ne fonctionnera pas si la licence est dépassée." },
+        
+        { cat: "Technique", q: "Limiter la taille des paquets ICMP (ping) entrants ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> C'est une protection classique (via les profils IPS) pour éviter les attaques 'Ping of Death' ou l'exfiltration de données via l'ICMP.<br><b>❌ Faux :</b> Bien que simple, l'ICMP est scruté en profondeur par le moteur ASQ." },
+        
+        { cat: "Admin", q: "Sur appliances physiques, copier la partition active vers la passive ?", options: ["Oui", "Non"], correct: 0, 
+          explain: "<b>✅ Oui :</b> Les boîtiers physiques ont deux partitions. Un simple bouton 'Cloner' permet de sauvegarder le système fonctionnel sur la partition de secours.<br><b>❌ Non :</b> Ce serait dommage de se priver de cette redondance native." },
+        
+        { cat: "Admin", q: "Basculer de partition principale à secours sans redémarrage ?", options: ["Oui", "Non"], correct: 1, 
+          explain: "<b>✅ Non :</b> Basculer de partition revient à changer le système d'exploitation chargé en RAM. Un reboot est physiquement obligatoire.<br><b>❌ Oui :</b> Ce n'est pas un simple rechargement de configuration à chaud." },
+        
+        { cat: "Admin", q: "Service NTP : a besoin du fuseau horaire pour l’heure locale ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Le serveur NTP délivre toujours l'heure UTC (universelle). Le firewall doit connaître la TimeZone pour décaler l'affichage dans les logs.<br><b>❌ Faux :</b> Sans TimeZone, tous vos logs auront 1h ou 2h de décalage." },
+        
+        { cat: "Admin", q: "Fréquence Active Update paramétrable depuis l’interface ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> L'intervalle de vérification des bases de signatures (Antivirus, IPS, URL) est réglable (ex: toutes les 2h) dans l'onglet Active Update.<br><b>❌ Faux :</b> Ce n'est pas bloqué ou géré uniquement par Stormshield." },
+        
+        { cat: "Admin", q: "Le firewall peut être serveur DHCP ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Le SNS intègre un service DHCP complet pour attribuer IP, passerelle, DNS et autres options aux clients locaux.<br><b>❌ Faux :</b> Même s'il est souvent délégué à un serveur Windows, le firewall sait le faire." },
+        
+        { cat: "Admin", q: "Navigateurs supportés :", options: ["Firefox, Edge, Chrome", "Opera, Safari", "Uniquement Firefox"], correct: 0, 
+          explain: "<b>✅ Firefox, Edge, Chrome :</b> L'interface HTML5 de Stormshield est optimisée et officiellement supportée sur ces 3 navigateurs majeurs.<br><b>❌ Uniquement Firefox :</b> C'était un peu le cas aux débuts (v8/v9), mais plus aujourd'hui." },
+        
+        { cat: "Logs", q: "Modifier le % d'espace disque par famille de traces ?", options: ["Oui", "Non"], correct: 0, 
+          explain: "<b>✅ Oui :</b> On peut allouer des quotas. Par exemple 70% pour le filtrage (très bavard) et 10% pour le système.<br><b>❌ Non :</b> Le disque n'est pas géré de manière globale et monolithique." },
+        
+        { cat: "Logs", q: "Logs pleins : que se passe-t-il ?", options: ["Arrêt firewall", "Rotation automatique", "Envoi d'un ping"], correct: 1, 
+          explain: "<b>✅ Rotation automatique :</b> Le système applique le principe FIFO (First In, First Out). Les vieux logs sont effacés au profit des nouveaux.<br><b>❌ Arrêt firewall :</b> La sécurité/production ne doit jamais s'arrêter pour une histoire de stockage." },
+        
+        { cat: "Logs", q: "Visualiser les journaux via Wireshark ?", options: ["Oui", "Non (Interface Admin)"], correct: 1, 
+          explain: "<b>✅ Non :</b> Wireshark lit des captures réseau (.pcap). Les logs Stormshield sont des fichiers textes (Syslog).<br><b>❌ Oui :</b> Confondre 'Capture réseau' et 'Journaux d'événements' est une erreur classique." },
+        
+        { cat: "Logs", q: "Le RGPD a-t-il un impact sur la gestion des logs ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Le RGPD impose des durées de rétention (ex: 1 an) et l'anonymisation des données personnelles (IP, noms) dans les exports.<br><b>❌ Faux :</b> Un pare-feu traitant des données d'employés est soumis au RGPD." },
+        
+        { cat: "Logs", q: "Arrêter l’écriture des événements pour une catégorie ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> On peut totalement décocher la génération de logs pour certaines catégories (ex: alarmes mineures) pour économiser du disque ou du CPU.<br><b>❌ Faux :</b> La journalisation est 100% granulaire." },
+        
+        { cat: "Objets", q: "Plusieurs objets FQDN en destination d'une règle ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> On peut regrouper plusieurs FQDN (noms de domaine) dans un 'Groupe' et placer ce groupe en destination d'une règle unique.<br><b>❌ Faux :</b> Les règles ne sont pas limitées à une seule IP ou un seul nom." },
+        
+        { cat: "Objets", q: "Réseau machine : résolution ARP périodique ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Le firewall va pinger l'IP pour vérifier que l'adresse physique (MAC) associée correspond toujours à celle configurée dans l'objet (Anti-Usurpation).<br><b>❌ Faux :</b> L'objet machine ne sert pas qu'à faire joli, il a des fonctions actives." },
+        
+        { cat: "Objets", q: "Serveur DNS : sert à quoi ?", options: ["Associer nom et IP", "Envoyer des mails", "Faire du NAT"], correct: 0, 
+          explain: "<b>✅ Associer nom et IP :</b> C'est l'annuaire d'Internet. Il traduit 'www.stormshield.com' en adresse IP (ex: 192.0.2.1).<br><b>❌ Envoyer des mails / NAT :</b> C'est le rôle des serveurs SMTP et des routeurs." },
+        
+        { cat: "Objets", q: "Équivalent objet 'Internet' :", options: ["Any", "Network_in", "Firewall_internals"], correct: 0, 
+          explain: "<b>✅ Any :</b> Représente toutes les adresses IP existantes (0.0.0.0/0). C'est ce qu'on utilise en destination pour viser Internet.<br><b>❌ Network_in / Internals :</b> Ciblent uniquement les réseaux privés connectés ou le boîtier lui-même." },
+        
+        { cat: "Objets", q: "Norme des VLAN sur Stormshield :", options: ["802.1Q", "RFC 894", "Hyperlan"], correct: 0, 
+          explain: "<b>✅ 802.1Q :</b> C'est LE standard IEEE mondial pour le taggage des trames VLAN. Stormshield l'utilise nativement.<br><b>❌ Autres :</b> RFC 894 concerne IP sur Ethernet, Hyperlan est un vieux standard sans fil." },
+        
+        { cat: "Objets", q: "Plus de deux interfaces dans un bridge ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Un bridge agit comme un switch. Vous pouvez y intégrer 3, 4 ou plus d'interfaces physiques qui partageront le même plan IP.<br><b>❌ Faux :</b> Un bridge n'est pas limité à un simple lien de point à point." },
+        
+        { cat: "Routage", q: "Répartition de charge possible pour :", options: ["Défaut", "Politique", "Dynamique", "Tous les types précités"], correct: 3, 
+          explain: "<b>✅ Tous :</b> Stormshield sait faire du Load Balancing sur les routes par défaut, le PBR (dans les règles) et via OSPF/BGP.<br><b>❌ Les autres choix :</b> Sont incomplets. Le firewall est très flexible sur ce point." },
+        
+        { cat: "Routage", q: "Route statique : interface de sortie obligatoire ?", options: ["Vrai", "Faux"], correct: 1, 
+          explain: "<b>✅ Faux :</b> Si vous indiquez la passerelle (IP), le moteur de routage trouve automatiquement l'interface de sortie liée à ce réseau.<br><b>❌ Vrai :</b> Ce n'est obligatoire que dans des cas de routages très spécifiques sans gateway." },
+        
+        { cat: "Routage", q: "Priorité par défaut (1 = prioritaire) :", options: ["PBR > Statique > Dynamique", "Statique > PBR > Dynamique", "Défaut > Statique"], correct: 0, 
+          explain: "<b>✅ PBR > Statique > Dynamique :</b> Le routage par politique (règles de filtrage) gagne toujours. Ensuite les routes manuelles, puis les protocoles dynamiques.<br><b>❌ Les autres ordres :</b> Inversent cette logique fondamentale." },
+        
+        { cat: "Routage", q: "NAT : modifier IP Source ET IP Destination simultanément ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Appelé 'Double NAT'. Une seule ligne dans le tableau NAT peut translater la source et la destination du même paquet.<br><b>❌ Faux :</b> Pas besoin de faire deux règles séparées pour ça." },
+        
+        { cat: "Routage", q: "Poids 50% GW1, 25% GW2, 25% GW3 :", options: ["2/1/1", "4/2/2", "Les deux"], correct: 2, 
+          explain: "<b>✅ Les deux :</b> C'est un ratio mathématique. 2/1/1 donne exactement la même répartition de charge (Load Balancing) que 4/2/2 ou 50/25/25.<br><b>❌ 2/1/1 ou 4/2/2 seuls :</b> Sont corrects mais restrictifs." },
+        
+        { cat: "Filtrage", q: "Règle pour serveur Web DMZ accessible d'Internet :", options: ["Internet vers IP Publique", "Internet vers IP Privée", "DMZ vers Internet"], correct: 0, 
+          explain: "<b>✅ Internet vers IP Publique :</b> Le pare-feu lit les règles de filtrage AVANT d'appliquer le NAT de destination (DNAT). Il voit donc le trafic arriver sur son IP publique.<br><b>❌ Internet vers IP Privée :</b> C'est le piège classique. L'IP privée n'est connue qu'après le passage dans le moteur NAT." },
+        
+        { cat: "Filtrage", q: "IPS Stormshield est-il propriétaire ?", options: ["Oui", "Non (Open Source)"], correct: 0, 
+          explain: "<b>✅ Oui :</b> Le moteur IPS basé sur la technologie ASQ (Active Security Qualification) est breveté et développé en interne par Stormshield.<br><b>❌ Non :</b> Ce n'est pas un moteur open-source comme Snort ou Suricata intégré dans la boîte." },
+        
+        { cat: "Filtrage", q: "Ordre de traitement des règles :", options: ["Par ordre d'apparition", "Plus restrictive en premier", "Bloquer en premier"], correct: 0, 
+          explain: "<b>✅ Par ordre d'apparition :</b> Le firewall lit les règles de haut en bas. Dès que ça 'match', il applique l'action et arrête de lire (First Match).<br><b>❌ Les autres :</b> Ce n'est pas une IA, il ne trie pas selon la restriction ou l'action. L'ordre manuel est crucial." },
+        
+        { cat: "Filtrage", q: "L'action 'Bloquer' déclenche une alarme ?", options: ["Vrai", "Faux"], correct: 1, 
+          explain: "<b>✅ Faux :</b> 'Bloquer' détruit le paquet silencieusement. Pour avoir une alarme, il faut explicitement configurer le niveau de 'Trace' sur la règle ou utiliser l'IPS.<br><b>❌ Vrai :</b> Si chaque paquet bloqué levait une alarme, le tableau de bord exploserait." },
+        
+        { cat: "Filtrage", q: "Filtrage par SNI (certificat) utilisable sur :", options: ["HTTP", "HTTPS", "Les deux"], correct: 1, 
+          explain: "<b>✅ HTTPS :</b> Le SNI (Server Name Indication) est une extension TLS envoyée en clair au début d'une connexion HTTPS. Ça permet de filtrer sans déchiffrer.<br><b>❌ HTTP :</b> N'utilise pas de certificats/TLS, on lit directement l'en-tête 'Host'." },
+        
+        { cat: "VPN", q: "Standard IPsec défini par :", options: ["IETF (Internet)", "Stormshield", "Cisco"], correct: 0, 
+          explain: "<b>✅ IETF :</b> C'est un standard ouvert mondial (RFC). Ça garantit que vous pouvez monter un VPN entre un Stormshield et un Cisco/Fortinet/etc.<br><b>❌ Cisco / Stormshield :</b> Personne n'est propriétaire d'IPsec." },
+        
+        { cat: "VPN", q: "Protocole de négociation IPsec :", options: ["IKE", "ESP", "AH"], correct: 0, 
+          explain: "<b>✅ IKE :</b> Internet Key Exchange sert uniquement à négocier les algorithmes et échanger les clés secrètes entre les sites.<br><b>❌ ESP / AH :</b> Servent au transport et au chiffrement des données *après* la négociation." },
+        
+        { cat: "VPN", q: "Phases pour établir un tunnel IPsec ?", options: ["1", "2", "3"], correct: 1, 
+          explain: "<b>✅ 2 phases :</b> Phase 1 (Création du canal de gestion IKE sécurisé) puis Phase 2 (Négociation du tunnel de données utilisateur IPsec SA).<br><b>❌ 1 ou 3 :</b> La norme IPsec classique se fait toujours en 2 grandes étapes." },
+        
+        { cat: "VPN", q: "VPN SSL : droit d'accès global à tous ?", options: ["Vrai", "Faux"], correct: 1, 
+          explain: "<b>✅ Faux :</b> Par sécurité, il faut explicitement autoriser les utilisateurs (ou groupes) dans la configuration du VPN ou via des règles d'accès.<br><b>❌ Vrai :</b> Ce serait une énorme faille de sécurité d'autoriser tout le LDAP par défaut." },
+        
+        { cat: "VPN", q: "Keepalive IPsec se configure en :", options: ["Secondes", "Minutes", "Heures"], correct: 0, 
+          explain: "<b>✅ Secondes :</b> Le DPD (Dead Peer Detection) envoie un 'ping' interne IPsec très régulièrement (ex: toutes les 10s) pour vérifier si le lien est tombé.<br><b>❌ Minutes / Heures :</b> Ce serait trop lent pour réagir à une coupure réseau." },
+        
+        { cat: "VPN", q: "Chiffrement IPsec assuré par :", options: ["ESP", "AH", "L2TP"], correct: 0, 
+          explain: "<b>✅ ESP :</b> Encapsulating Security Payload est le seul protocole IPsec qui crypte la charge utile pour garantir la confidentialité.<br><b>❌ AH :</b> N'assure que l'intégrité et l'authentification, pas le chiffrement." },
+        
+        { cat: "Avancé", q: "Analyse antivirale sur flux HTTPS :", options: ["Oui, si déchiffrement", "Oui, toujours", "Non jamais"], correct: 0, 
+          explain: "<b>✅ Oui, si déchiffrement :</b> Le flux HTTPS est illisible. Le firewall doit faire du Proxy SSL (Man in the Middle légitime) pour analyser les fichiers.<br><b>❌ Toujours :</b> Faux, sans déchiffrement, l'antivirus est aveugle." },
+        
+        { cat: "Avancé", q: "Breach Fighter nécessite 'Antivirus avancé' ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Breach Fighter (Sandboxing Cloud) analyse les fichiers suspects. Il utilise l'Antivirus Avancé (Bitdefender/Kaspersky) comme premier filtre avant l'envoi dans le Cloud.<br><b>❌ Faux :</b> L'antivirus standard (ClamAV) n'est pas suffisant pour cette option." },
+        
+        { cat: "Avancé", q: "Extended Web Control évite le stockage local URL ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Au lieu de stocker une énorme base de données sur le disque dur du firewall, l'EWC interroge les serveurs Cloud Stormshield en temps réel.<br><b>❌ Faux :</b> C'est justement son principal argument de vente." },
+        
+        { cat: "Avancé", q: "HTTPS non déchiffré : certificat affiché est celui du proxy ?", options: ["Vrai", "Faux"], correct: 1, 
+          explain: "<b>✅ Faux :</b> Si on ne déchiffre pas, le firewall laisse passer la connexion. L'utilisateur voit le vrai certificat du serveur (ex: Google).<br><b>❌ Vrai :</b> Le certificat du proxy n'est présenté à l'utilisateur QUE s'il y a déchiffrement SSL." },
+        
+        { cat: "Avancé", q: "Proxy SSL activé via règle de filtrage ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> C'est dans la colonne 'Inspection' de la règle de filtrage qu'on choisit d'activer ou non l'analyse SSL (Proxy SSL) pour ce flux précis.<br><b>❌ Faux :</b> Ce n'est pas un bouton global On/Off pour tout le firewall." },
+        
+        { cat: "Admin", q: "Sauvegarde partition active possible ?", options: ["Oui, tous modèles", "Physique seulement", "Virtuel seulement"], correct: 0, 
+          explain: "<b>✅ Oui, tous modèles :</b> La sauvegarde de la partition entière (backup system) est une fonction clé de fiabilité, dispo sur toutes les appliances physiques (Virtualisation à part via snapshots).<br><b>❌ Physique seulement :</b> *Note : Virtuel se sauvegarde via Snapshot Hyperviseur, mais l'outil interne existe.*" },
+        
+        { cat: "Technique", q: "Mode 'Transparent' :", options: ["Bridge (Interfaces pontées)", "Adressage par interface", "Aucune IP"], correct: 0, 
+          explain: "<b>✅ Bridge :</b> S'insérer en coupure sur un réseau existant sans changer l'adressage IP se fait en créant un pont (Bridge) entre deux interfaces.<br><b>❌ Adressage / Aucune IP :</b> Un firewall sans IP est ingérable. L'adressage standard s'appelle le mode 'Routeur'." },
+        
+        { cat: "Routage", q: "Routage sans NAT : champs modifiés ?", options: ["MAC Source/Destination", "IP Source/Destination", "Ports"], correct: 0, 
+          explain: "<b>✅ MAC Source/Destination :</b> Un routeur classique ne touche jamais aux adresses IP. Il réécrit uniquement les adresses MAC à chaque saut (hop) Ethernet.<br><b>❌ IP / Ports :</b> Ça, c'est exactement ce que fait le NAT/PAT !" },
+        
+        { cat: "Logs", q: "Accès complet aux logs via code temporaire ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Pour être conforme RGPD, les données nominatives dans les logs peuvent être masquées et débloquées uniquement via un 'Jeton d'accès' (temporaire) généré par un responsable.<br><b>❌ Faux :</b> Stormshield intègre cette gestion fine de la confidentialité." },
+        
+        { cat: "Auth", q: "Auth LDAP interne : mot de passe obligatoire ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Validation nécessaire du mot de passe pour mapper l'identité LDAP.<br><b>❌ Faux :</b> L'anonymat contredit le concept même d'annuaire d'authentification." },
+        
+        { cat: "Filtrage", q: "Connexions externes analysées ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Le moteur IPS (ASQ) analyse les paquets dans les deux sens (Internet vers LAN et LAN vers Internet) pour bloquer les intrusions ET les exfiltrations.<br><b>❌ Faux :</b> Un pare-feu moderne ne fait pas que se protéger de l'extérieur." },
+        
+        { cat: "Technique", q: "135.1.1.0/23 est une adresse :", options: ["Réseau", "Hôte", "Broadcast"], correct: 0, 
+          explain: "<b>✅ Réseau :</b> En notation /23, le 3ème octet avance par bloc de 2. L'IP réseau de ce bloc est 135.1.0.0. 135.1.1.0 est une IP d'hôte dans ce réseau. (*Si la question implique /24 c'est Réseau, en /23 c'est Hôte. Le piège classique des sous-réseaux !*)<br><b>❌ Autres :</b> Vérifiez vos calculs binaires !" },
+        
+        { cat: "VPN", q: "VPN entre 2 SNS :", options: ["IPsec", "SSL", "OpenVPN", "Tous"], correct: 3, 
+          explain: "<b>✅ Tous :</b> Bien qu'IPsec soit le standard pour le Site-à-Site, deux SNS peuvent très bien monter un lien permanent via VPN SSL ou OpenVPN si nécessaire.<br><b>❌ Les autres :</b> Sont corrects mais partiels." },
+        
+        { cat: "Admin", q: "Administration via :", options: ["Navigateur, CLI, SSH", "Telnet uniquement", "Console uniquement"], correct: 0, 
+          explain: "<b>✅ Navigateur, CLI, SSH :</b> Le SNS s'administre via HTTPS (Web), en SSH (Ligne de commande réseau), ou via le port Console série en physique.<br><b>❌ Telnet :</b> Interdit car non chiffré. Console uniquement est faux." },
+        
+        { cat: "Filtrage", q: "Modifier l'action de plusieurs règles à la fois ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> On peut faire de la sélection multiple (Shift/Ctrl) dans la grille de filtrage pour passer 10 règles de 'Passer' à 'Bloquer' en un clic.<br><b>❌ Faux :</b> Pas besoin de les éditer une par une." },
+        
+        { cat: "Technique", q: "Interfaces VLAN toujours internes ?", options: ["Vrai", "Faux"], correct: 1, 
+          explain: "<b>✅ Faux :</b> Un opérateur Fibre peut très bien vous fournir internet sur le VLAN 832 (ex: Orange). Vous devrez créer ce VLAN sur l'interface Externe (OUT).<br><b>❌ Vrai :</b> Les VLANs ne sont pas limités au LAN interne." },
+        
+        { cat: "Routage", q: "Translation statique :", options: ["1 IP Privée vers 1 IP Publique", "N vers 1", "1 vers N"], correct: 0, 
+          explain: "<b>✅ 1 vers 1 :</b> Le NAT statique (BIMAP) lie de façon permanente 1 IP privée à 1 IP publique. C'est bidirectionnel.<br><b>❌ N vers 1 :</b> C'est le NAT Masquage dynamique classique pour l'accès internet." },
+        
+        { cat: "Avancé", q: "Redirection port ICMP possible ?", options: ["Vrai", "Faux"], correct: 1, 
+          explain: "<b>✅ Faux :</b> Le protocole ICMP (Ping) fonctionne en couche réseau et ne possède pas la notion de 'Ports' (comme TCP 80). On ne peut donc pas rediriger un port qui n'existe pas.<br><b>❌ Vrai :</b> C'est un non-sens technique." },
+        
+        { cat: "Logs", q: "Tracer une règle NAT ?", options: ["Oui", "Non"], correct: 0, 
+          explain: "<b>✅ Oui :</b> On peut activer la journalisation ('Trace') directement sur une règle NAT pour voir dans les logs comment le firewall transforme les IPs.<br><b>❌ Non :</b> Les logs ne sont pas réservés qu'au filtrage." },
+        
+        { cat: "VPN", q: "IKEv1 : extrémités de trafic identiques ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> C'est une limite d'IKEv1. Les réseaux annoncés de chaque côté (Local/Remote) doivent 'matcher' exactement en miroir pour que le tunnel monte.<br><b>❌ Faux :</b> IKEv2 est plus souple sur ce point, mais pas IKEv1." },
+        
+        { cat: "Routage", q: "Algorithme répartition : quadruplet IP/Port ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> Le load-balancing utilise l'IP/Port Source et Destination pour s'assurer qu'une même session TCP (ex: téléchargement) reste toujours sur le même lien FAI.<br><b>❌ Faux :</b> S'il changeait de lien en cours de route, le serveur distant couperait la connexion." },
+        
+        { cat: "Auth", q: "Politique d'auth basée sur machine source ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> On peut créer des règles d'authentification demandant un annuaire précis pour le Réseau A, et aucun mot de passe pour l'IP du serveur B.<br><b>❌ Faux :</b> L'authentification est totalement granulaire." },
+        
+        { cat: "Objets", q: "Objet FQDN : adresse via DNS ?", options: ["Vrai", "Faux"], correct: 0, 
+          explain: "<b>✅ Vrai :</b> L'objet FQDN (ex: update.microsoft.com) force le firewall à requêter un DNS périodiquement pour mettre à jour l'IP sous-jacente dynamiquement.<br><b>❌ Faux :</b> Ce n'est pas juste un champ de texte décoratif." }
     ];
 
     let sessionQuestions = [];
@@ -237,7 +334,8 @@
     let selectedIdx = null;
     let history = [];
 
-    // Lancement et Initialisation
+    // --- MOTEUR DE JEU ---
+
     window.onload = () => {
         const best = localStorage.getItem('sns_best') || 0;
         const last = localStorage.getItem('sns_last') || '--';
@@ -247,7 +345,6 @@
 
     function startQuiz() {
         switchScreen('screen-quiz');
-        // Mélange des 65 questions
         sessionQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
         currentIdx = 0; score = 0; history = [];
         loadQuestion();
@@ -257,35 +354,30 @@
         const q = sessionQuestions[currentIdx];
         selectedIdx = null;
         
-        // Cacher l'explication précédente
         document.getElementById('explanation-box').style.display = 'none';
         
-        // UI Headers
-        document.getElementById('q-category').innerText = q.cat.toUpperCase();
+        document.getElementById('q-category').innerText = q.cat;
         document.getElementById('q-counter').innerText = `${currentIdx + 1} / 65`;
         document.getElementById('progress-bar').style.width = `${((currentIdx) / 65) * 100}%`;
         document.getElementById('q-text').innerText = q.q;
         
-        // Générer les options
         const optsContainer = document.getElementById('q-options');
         optsContainer.innerHTML = '';
         
         q.options.forEach((opt, i) => {
             const div = document.createElement('div');
-            div.className = 'option';
-            div.innerText = opt;
+            div.className = 'option'; div.innerText = opt;
             div.onclick = () => selectOption(i, div);
             optsContainer.appendChild(div);
         });
 
-        // Boutons
         document.getElementById('btn-validate').style.display = 'block';
         document.getElementById('btn-validate').disabled = true;
         document.getElementById('btn-next').style.display = 'none';
     }
 
     function selectOption(index, element) {
-        if (document.getElementById('btn-next').style.display === 'block') return; // Bloque si déjà validé
+        if (document.getElementById('btn-next').style.display === 'block') return; 
         
         selectedIdx = index;
         document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
@@ -299,26 +391,17 @@
         
         if (isCorrect) score++;
         
-        // Enregistrer pour le récapitulatif
         history.push({
-            q: q.q,
-            userAns: q.options[selectedIdx],
-            correctAns: q.options[q.correct],
-            isCorrect: isCorrect
+            q: q.q, userAns: q.options[selectedIdx], correctAns: q.options[q.correct], isCorrect: isCorrect
         });
 
-        // Colorer les options
         const optionsHTML = document.querySelectorAll('.option');
         optionsHTML[q.correct].classList.add('correct');
-        if (!isCorrect) {
-            optionsHTML[selectedIdx].classList.add('wrong');
-        }
+        if (!isCorrect) optionsHTML[selectedIdx].classList.add('wrong');
 
-        // Afficher l'explication
         document.getElementById('explanation-text').innerHTML = q.explain;
         document.getElementById('explanation-box').style.display = 'block';
 
-        // Gérer les boutons
         document.getElementById('btn-validate').style.display = 'none';
         document.getElementById('btn-next').style.display = 'block';
         document.getElementById('progress-bar').style.width = `${((currentIdx + 1) / 65) * 100}%`;
@@ -326,25 +409,18 @@
 
     function nextQuestion() {
         currentIdx++;
-        if (currentIdx < 65) {
-            loadQuestion();
-        } else {
-            endQuiz();
-        }
+        if (currentIdx < 65) loadQuestion(); else endQuiz();
     }
 
     function endQuiz() {
         switchScreen('screen-recap');
         
-        // Mettre à jour les stats locales
         localStorage.setItem('sns_last', score);
         const best = localStorage.getItem('sns_best') || 0;
         if (score > best) localStorage.setItem('sns_best', score);
 
-        // Afficher score
         document.getElementById('final-score').innerText = `${score}/65`;
 
-        // Afficher le récapitulatif
         const listHTML = document.getElementById('recap-list');
         listHTML.innerHTML = history.map((item, index) => `
             <div class="recap-item ${item.isCorrect ? 'is-correct' : ''}">
